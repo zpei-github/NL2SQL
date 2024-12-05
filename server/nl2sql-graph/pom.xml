@@ -4,6 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <modules.version>0.0.1-SNAPSHOT</modules.version>
+    </properties>
+
+
     <!-->父工程信息<!-->
     <parent>
         <groupId>com.nl2sql</groupId>
@@ -15,14 +23,10 @@
     <groupId>com.nl2sql</groupId>
     <artifactId>nl2sql-graph</artifactId>
     <name>nl2sql-graph</name>
-    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <version>${modules.version}</version>
 
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <dependencies>
+    </dependencies>
 
 </project>

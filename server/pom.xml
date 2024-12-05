@@ -3,6 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<!-->自定义的变量需要在properties中进行声明<!-->
+	<properties>
+		<java.version>1.8</java.version>
+		<modules.version>0.0.1-SNAPSHOT</modules.version>
+	</properties>
+
 	<!-- lookup parent from repository -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -18,17 +24,15 @@
 	<description>The Graduate Project of Zhang Pei</description>
 	<packaging>pom</packaging>
 
+
 	<modules>
 		<module>nl2sql-graph</module>
 		<module>nl2sql-llm</module>
 		<module>nl2sql-web</module>
 	</modules>
 
-	<properties>
-		<java.version>1.8</java.version>
-	</properties>
 
-
+	<!-->dependencyManagement用于管理依赖的版本，后续子模块声明的依赖如果在其中出现就可以不用关心依赖的版本<!-->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -36,19 +40,22 @@
 				<artifactId>nl2sql-graph</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
-
 			<dependency>
 				<groupId>com.nl2sql</groupId>
 				<artifactId>nl2sql-llm</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
-
-			<dependency>
-				<groupId>com.nl2sql</groupId>
-				<artifactId>nl2sql-web</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<!-->父模块的dependencies会被所有子模块依赖，不需要在子模块中声明依赖<!-->
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
 </project>

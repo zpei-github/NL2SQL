@@ -2,7 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<properties>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<modules.version>0.0.1-SNAPSHOT</modules.version>
+	</properties>
 	<parent>
 		<groupId>com.nl2sql</groupId>
 		<artifactId>nl2sql</artifactId>
@@ -12,16 +17,26 @@
 
 	<groupId>com.nl2sql</groupId>
 	<artifactId>nl2sql-web</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>nl2sql-web</name>
 	<description>Web Module</description>
 	<packaging>jar</packaging>
+	<version>${modules.version}</version>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.nl2sql</groupId>
+			<artifactId>nl2sql-graph</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.nl2sql</groupId>
+			<artifactId>nl2sql-llm</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
