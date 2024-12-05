@@ -17,8 +17,6 @@ public interface Node {
     public Set<Node> getNeighbours();
 
     // 添加一个邻居节点
-    public boolean addNeighbour(Node n);
-
     public boolean addNeighbour(Node n, Long weight);
 
     // 设置与邻居节点的权重

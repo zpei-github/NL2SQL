@@ -35,19 +35,8 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public boolean addNeighbour(Node n) {
-        if (null == n) return false;
-
-        if(neighbours.containsKey(n)) {
-            return false;
-        }
-        neighbours.put(n, null);
-        return true;
-    }
-
-    @Override
     public boolean addNeighbour(Node n, Long weight) {
-        if (null == n) return false;
+        if (null == n || weight == null) return false;
 
         if(neighbours.containsKey(n)) {
             return false;
@@ -58,7 +47,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public boolean setWeight(Node n, Long weight) {
-        if (null == n) return false;
+        if (null == n || weight == null) return false;
         if(!neighbours.containsKey(n)) {
             return false;
         }
