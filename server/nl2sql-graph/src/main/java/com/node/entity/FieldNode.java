@@ -21,6 +21,10 @@ public class FieldNode extends AbstractNode {
 
     public FieldNode() {}
 
+    public FieldNode(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法
     @Override
     public boolean equals(Object o) {
@@ -41,6 +45,6 @@ public class FieldNode extends AbstractNode {
 
     @Override
     public String toString() {
-        return this.fieldName;
+        return "FieldNode@@" + this.fieldName;
     }
 }

@@ -24,6 +24,11 @@ public class GranularityNode extends AbstractNode {
     private Set<Node> fields;
 
     public GranularityNode() {
+        this(null);
+    }
+
+    public GranularityNode(String granularityName) {
+        this.GranularityName = granularityName;
         fields = new HashSet<>();
     }
 
@@ -59,5 +64,10 @@ public class GranularityNode extends AbstractNode {
     @Override
     public int hashCode() {
         return Objects.hash("GranularityNode" + this.GranularityName);
+    }
+
+    @Override
+    public String toString() {
+        return "GranularityNode@@" + this.GranularityName;
     }
 }

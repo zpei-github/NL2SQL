@@ -21,8 +21,13 @@ public class TableNode extends AbstractNode {
     private String tableName;
     private Node granularity;
 
-    public TableNode() {}
+    public TableNode() {
+        this(null);
+    }
 
+    public TableNode(String tableName) {
+        this.tableName = tableName;
+    }
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法
     @Override
@@ -45,6 +50,6 @@ public class TableNode extends AbstractNode {
 
     @Override
     public String toString() {
-        return this.tableName;
+        return "TableNode@@" + this.tableName;
     }
 }
