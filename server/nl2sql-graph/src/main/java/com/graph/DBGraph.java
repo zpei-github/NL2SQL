@@ -83,7 +83,7 @@ public class DBGraph implements Graph {
      * @create 2024/12/7
      **/
     @Override
-    public int node2index(Node n) {
+    public Integer node2index(Node n) {
         if (n == null) return -1;
         return node2index.get(n);
     }
@@ -162,7 +162,7 @@ public class DBGraph implements Graph {
         // 判断是否添加到索引以及是否越界
         if (n1index == null || n2index == null ) return -2;
 
-        if(n1index >= dbGraph.size() || n2index > dbGraph.get(n1index).size()) return null;
+        if(n1index >= dbGraph.size() || n2index >= dbGraph.get(n1index).size()) return null;
 
         return dbGraph.get(node2index.get(n1)).get(node2index.get(n2));
     }
@@ -178,7 +178,7 @@ public class DBGraph implements Graph {
      **/
     @Override
     public Integer getWeight(int i1, int i2) {
-        if(i1 >= dbGraph.size() || i2 > dbGraph.get(i1).size()) return null;
+        if(i1 >= dbGraph.size() || i2 >= dbGraph.get(i1).size()) return null;
         return dbGraph.get(i1).get(i2);
     }
 

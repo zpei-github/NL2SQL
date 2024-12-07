@@ -52,7 +52,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    public int node2index(Node n);
+    public Integer node2index(Node n);
 
 
     /** 由索引值index获取对应的节点node

@@ -24,7 +24,7 @@
 	<description>The Graduate Project of Zhang Pei</description>
 	<packaging>pom</packaging>
 
-
+	<!-->modules用于声明所有的子模块，必须要存在<!-->
 	<modules>
 		<module>nl2sql-graph</module>
 		<module>nl2sql-llm</module>
