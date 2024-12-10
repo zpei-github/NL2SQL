@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 @Setter
 @Getter
 public class GranularityNode extends AbstractNode {
+
     private String GranularityName;
 
     // 粒度包含那些字段
@@ -44,6 +46,14 @@ public class GranularityNode extends AbstractNode {
             return false;
         }
         return fields.remove(field);
+    }
+
+    public int fieldCount() {
+        return fields.size();
+    }
+
+    public Iterator<Node> fieldIterator() {
+        return fields.iterator();
     }
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法

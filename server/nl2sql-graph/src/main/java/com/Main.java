@@ -9,9 +9,7 @@ import com.node.entity.FieldNode;
 import com.node.entity.GranularityNode;
 import com.node.entity.TableNode;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Main {
@@ -21,51 +19,108 @@ public class Main {
 
         MSTree mst = new MSTree();
 
-        TableNode n0 = (TableNode) factory.createNode("table", "class_location");
-        TableNode n1 = (TableNode) factory.createNode("table", "stu_class");
-        TableNode n2 = (TableNode) factory.createNode("table", "teacher_class");
-        FieldNode n3 = (FieldNode)factory.createNode("field", "student_name");
-        FieldNode n4 = (FieldNode)factory.createNode("field", "teacher_name");
-        FieldNode n5 = (FieldNode)factory.createNode("field", "class_name");
-        GranularityNode n6 = (GranularityNode)factory.createNode("granularity", "class");
-        GranularityNode n7 = (GranularityNode)factory.createNode("granularity", "stu");
-        GranularityNode n8 = (GranularityNode)factory.createNode("granularity", "teacher");
+        TableNode n0 = (TableNode) factory.createNode("table", "teacher");
+        TableNode n1 = (TableNode) factory.createNode("table", "dim_course");
+        TableNode n2 = (TableNode) factory.createNode("table", "live_plans");
+        TableNode n3 = (TableNode) factory.createNode("table", "stu");
+        TableNode n4 = (TableNode) factory.createNode("table", "stu_course");
+        TableNode n5 = (TableNode) factory.createNode("table", "stu_live_classes");
+        TableNode n6 = (TableNode) factory.createNode("table", "stu_live_plans");
+        FieldNode n7 = (FieldNode)factory.createNode("field", "tea_id");
+        FieldNode n8 = (FieldNode)factory.createNode("field", "course_id");
+        FieldNode n9 = (FieldNode)factory.createNode("field", "stu_id");
+        FieldNode n10 = (FieldNode)factory.createNode("field", "plan_id");
+        FieldNode n11 = (FieldNode)factory.createNode("field", "class_id");
+        GranularityNode n12 = (GranularityNode)factory.createNode("granularity", "tea");
+        GranularityNode n13 = (GranularityNode)factory.createNode("granularity", "course");
+        GranularityNode n14 = (GranularityNode)factory.createNode("granularity", "stu");
+        GranularityNode n15 = (GranularityNode)factory.createNode("granularity", "plan");
+        GranularityNode n16 = (GranularityNode)factory.createNode("granularity", "stu_course");
+        GranularityNode n17 = (GranularityNode)factory.createNode("granularity", "stu_course_plan_class");
 
-        n0.setGranularity(n6);
-        n1.setGranularity(n7);
-        n2.setGranularity(n8);
-        n6.addField(n5);
-        n7.addField(n3);
-        n8.addField(n4);
+
+
+        n0.setGranularity(n12);
+        n1.setGranularity(n13);
+        n2.setGranularity(n15);
+        n3.setGranularity(n14);
+        n4.setGranularity(n16);
+        n5.setGranularity(n16);
+        n6.setGranularity(n17);
+
+        n12.addField(n7);
+        n13.addField(n8);
+        n14.addField(n9);
+        n15.addField(n10);
+        n16.addField(n8);
+        n16.addField(n9);
+        n17.addField(n8);
+        n17.addField(n9);
+        n17.addField(n10);
+        n17.addField(n11);
 
         graph.addTableNode(n0);
         graph.addTableNode(n1);
         graph.addTableNode(n2);
-        graph.addFieldNode(n3);
-        graph.addFieldNode(n4);
-        graph.addFieldNode(n5);
-        graph.addGranularityNode(n6);
-        graph.addGranularityNode(n7);
-        graph.addGranularityNode(n8);
+        graph.addTableNode(n3);
+        graph.addTableNode(n4);
+        graph.addTableNode(n5);
+        graph.addTableNode(n6);
 
-        graph.link(n1, n3, 5);
-        graph.link(n1, n5, 5);
-        graph.link(n2, n4, 5);
-        graph.link(n2, n5, 5);
-        graph.link(n0, n4, 5);
+
+        graph.addFieldNode(n7);
+        graph.addFieldNode(n8);
+        graph.addFieldNode(n9);
+        graph.addFieldNode(n10);
+        graph.addFieldNode(n11);
+
+        graph.addGranularityNode(n12);
+        graph.addGranularityNode(n13);
+        graph.addGranularityNode(n14);
+        graph.addGranularityNode(n15);
+        graph.addGranularityNode(n16);
+        graph.addGranularityNode(n17);
+
+
+        graph.link(n0, n7, 1);
+        graph.link(n0, n12, 2);
+
+        graph.link(n1, n7, 1);
+        graph.link(n1, n8, 1);
+        graph.link(n1, n13, 2);
+
+        graph.link(n2, n10, 1);
+        graph.link(n2, n15, 2);
+
+        graph.link(n3, n9, 1);
+        graph.link(n3, n14, 2);
+
+        graph.link(n4, n7, 1);
+        graph.link(n4, n8, 1);
+        graph.link(n4, n9, 1);
+        graph.link(n4, n16, 2);
+
+        graph.link(n5, n8, 1);
+        graph.link(n5, n9, 1);
+        graph.link(n5, n11, 1);
+        graph.link(n5, n16, 2);
+
+        graph.link(n6, n8, 1);
+        graph.link(n6, n9, 1);
+        graph.link(n6, n10, 1);
+        graph.link(n6, n11, 1);
+        graph.link(n6, n17, 2);
+        graph.compute();
+
 
         mst.initial(graph);
 
-        List<Node> keys1 = new ArrayList<>();
-        keys1.add(n3);
-        keys1.add(n2);
-
         Set<Node> keys2 = new HashSet<>();
-        keys2.add(graph.findFieldNode("teacher_name"));
-        keys2.add(graph.findFieldNode("student_name"));
-        keys2.add(graph.findTableNode("class_location"));
+        keys2.add(graph.findTableNode("teacher"));
+        keys2.add(graph.findTableNode("stu_live_plans"));
 
         // mst.solve(keys1);
         mst.solve(keys2);
+
     }
 }

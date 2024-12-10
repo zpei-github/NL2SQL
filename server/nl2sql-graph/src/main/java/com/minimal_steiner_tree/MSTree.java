@@ -12,17 +12,13 @@ import java.util.*;
  */
 public class MSTree {
     private int n = -1;  // 图中节点总数
-    private int k = -1;  // 关键节点数量
-    private int fullMask = -1; //状态总数
-    private int lastKey = -1;  //最后一个关键节点
-    private long[][] dist; // shortest distances between all pairs
-    private int[][] nextNode; // 用于重建路径的节点
+    private long[][] dist; // 节点对之间的最短距离
+    private int[][] nextNode; // 用于重建原有的图
+
     /** 状态压缩二维数组
      * dp[i][s] 表示以节点i为根，包含S点集合的最小权重和
      * 其中s是以二进制记录点集合的方式: 当 i = s时，代表节点i到自身的最小权重和0
      */
-    private long[][] dp;
-    private int[][] parent;  // 记录每个节点的前驱节点，用于回溯路径
     private Graph graph;
 
     public MSTree(){}
@@ -68,6 +64,8 @@ public class MSTree {
                 for (int j = 0; j < n; j++) {
                     if (dist[i][k] + dist[k][j] < dist[i][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
+
+                        // 如果最ij之间存在中间节点k使得ij路径减少，则nextNode记录下中间节点k
                         nextNode[i][j] = (nextNode[i][k] == -1 ? k : nextNode[i][k]);
                     }
                 }
@@ -77,10 +75,7 @@ public class MSTree {
     }
 
 
-    private boolean keyNodesInitial(Set<Node> keyNodes) {
-        k = keyNodes.size();
-        fullMask = (1 << k) - 1;
-
+    private boolean keyNodesInitial(Set<Node> keyNodes, int k, long[][] dp, int[][] parent) {
         int[] terminals = new int[k];
         Iterator<Node> iter = keyNodes.iterator();
         for (int i = 0; i < k; i++) {
@@ -97,9 +92,6 @@ public class MSTree {
             }
         }
 
-        dp = new long[n][1 << k];
-        parent = new int[n][1 << k];
-
         // 初始化dp和parent
         for (int v = 0; v < n; v++) {
             Arrays.fill(dp[v], Integer.MAX_VALUE);
@@ -114,14 +106,21 @@ public class MSTree {
             // 存在不属于图的节点就会初始化失败
             if(x == null) {return false;}
             dp[x][1 << i] = 0; // 初始化状态
-            lastKey = x; // 记录最后一个关键节点
         }
         return true;
     }
 
 
-    public void solve(Set<Node> keyNodes){
-        if(!keyNodesInitial(keyNodes)) return;
+    public boolean solve(Set<Node> keyNodes){
+        int k = keyNodes.size();
+        int fullMask = (1 << k) - 1;
+
+        long[][] dp = new long[n][1 << k];
+        int[][] parent = new int[n][1 << k];
+
+        if(!keyNodesInitial(keyNodes, k, dp, parent)) return false;
+
+
 
         // Dreyfus-Wagner DP
         for (int S = 1; S <= fullMask; S++) {
@@ -176,17 +175,17 @@ public class MSTree {
         System.out.println("Minimum Steiner Tree weight: " + ans);
 
         Set<String> usedEdges = new HashSet<>();
-        rebuildSolution(bestV, fullMask, usedEdges);
+        rebuildSolution(bestV, fullMask, usedEdges, parent);
 
         // usedEdges中存放的边表示最终的斯坦纳树边集，实际需要根据重建路径函数生成(u,v)的edge对
         System.out.println("Edges in the Steiner Tree:");
         for (String e : usedEdges) {
             System.out.println(e);
         }
-
+        return true;
     }
 
-    private void rebuildSolution(int v, int S, Set<String> usedEdges) {
+    private void rebuildSolution(int v, int S, Set<String> usedEdges, int[][] parent) {
         int p = parent[v][S];
         if (p == -1) {
             // base case, no parent means either a single terminal or no improvement
@@ -197,12 +196,12 @@ public class MSTree {
             int S1 = p;
             int S2 = S ^ S1;
             // 再递归重建S1和S2的解
-            rebuildSolution(v, S1, usedEdges);
-            rebuildSolution(v, S2, usedEdges);
+            rebuildSolution(v, S1, usedEdges, parent);
+            rebuildSolution(v, S2, usedEdges, parent);
         } else {
             // p是负数，表示通过dp[v][S] = dp[u][S] + dist[u][v]的方式更新
             int u = ~p; // recover u
-            rebuildSolution(u, S, usedEdges);
+            rebuildSolution(u, S, usedEdges, parent);
             // 将u到v的最短路径加入解中
             addPath(u, v, usedEdges);
         }
@@ -223,7 +222,9 @@ public class MSTree {
     }
 
     private String edgeKey(int a, int b) {
-        return (a < b) ? a + "-" + b : b + "-" + a;
+        Node na = graph.index2node(a);
+        Node nb = graph.index2node(b);
+        return (a < b) ? na + " ----> " + nb : nb + " ----> " + na;
     }
 }
 

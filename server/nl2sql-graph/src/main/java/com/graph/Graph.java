@@ -13,15 +13,6 @@ import java.util.List;
  */
 
 public interface Graph {
-    // 字段与所属表之间的权值定为1L
-    public final static Long FIELD_TABLE_WEIGHT = 1L;
-
-    // 如果该粒度就是表的粒度，或者比表的粒度细，则权值定为5L
-    public final static Long FULL_GRANULARITY_TABLE_WEIGHT = 3L;
-
-    // 如果该粒度比表的粒度粗，则初始值定为10L
-    public final static Long INITIAL_GRANULARITY_TABLE_WEIGHT = 10L;
-
     /** 将节点添加到图中，并给节点n分配唯一的索引值index
      * 在图中所有的节点需要有一个固定的索引值index，方便索引和创建邻接矩阵
      * @param n
@@ -144,4 +135,12 @@ public interface Graph {
      * @create 2024/12/5
      **/
     public List<Integer> extractNeighborIndex(int n);
+
+    /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
+     *
+     * @return
+     * @author zpei
+     * @create 2024/12/9
+     **/
+    public boolean compute();
 }
