@@ -6,7 +6,6 @@
 	<!-->自定义的变量需要在properties中进行声明<!-->
 	<properties>
 		<java.version>1.8</java.version>
-		<modules.version>0.0.1-SNAPSHOT</modules.version>
 	</properties>
 
 	<!-- lookup parent from repository -->
@@ -19,7 +18,7 @@
 
 	<groupId>com.nl2sql</groupId>
 	<artifactId>nl2sql</artifactId>
-	<version>0.0.1-RELEASE</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>nl2sql</name>
 	<description>The Graduate Project of Zhang Pei</description>
 	<packaging>pom</packaging>
@@ -43,6 +42,12 @@
 			<dependency>
 				<groupId>com.nl2sql</groupId>
 				<artifactId>nl2sql-llm</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.nl2sql</groupId>
+				<artifactId>nl2sql-web</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>

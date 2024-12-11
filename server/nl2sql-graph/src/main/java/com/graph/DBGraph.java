@@ -63,6 +63,45 @@ public class DBGraph extends MatrixGraph {
     }
 
 
+    /** 添加一个节点
+     * 在添加时会进行区分
+     * @param n
+     * @return
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean add(Node n){
+        if (n == null) return false;
+
+        if(n.getClass().equals(FieldNode.class)){
+            return addFieldNode((FieldNode) n);
+        }else if(n.getClass().equals(TableNode.class)){
+            return addTableNode((TableNode) n);
+        }else if(n.getClass().equals(GranularityNode.class)){
+            return addGranularityNode((GranularityNode) n);
+        }
+        return false;
+    }
+
+    /** 移除一个节点
+     * 会进行区分
+     * @param n
+     * @return
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean remove(Node n){
+        if (n == null) return false;
+        if(n.getClass().equals(FieldNode.class)){
+            return removeFieldNode((FieldNode) n);
+        } else if(n.getClass().equals(TableNode.class)){
+            return removeTableNode((TableNode) n);
+        } else if(n.getClass().equals(GranularityNode.class)){
+            return removeGranularityNode((GranularityNode) n);
+        }
+        return false;
+    }
+
     /** 连接表和字段
      * 当连接的是表和字段时，需要特殊处理。具体来说字段节点不会allocateIndex分配索引，而是仅做保存；
      * 但是会将对应的表节点map存储
@@ -73,7 +112,7 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/8
      **/
-    private boolean link_field_table(TableNode table, FieldNode field , Integer weight){
+    public boolean link_field_table(TableNode table, FieldNode field , Integer weight){
         if(!field_tables.containsKey(field) || !node2index.containsKey(table)
         ) return false;
 
@@ -92,12 +131,7 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/9
      **/
-    private boolean link_table_granularity(TableNode table, GranularityNode gran, Integer weight){
-        // 当粒度没有设置包含字段或者表没有定义粒度时，将不会被添加至图中
-        if(gran.fieldCount() == 0 || table.getGranularity() == null
-        ){
-            return false;
-        }
+    public boolean link_table_granularity(TableNode table, GranularityNode gran, Integer weight){
         return super.link(table, gran, weight);
     }
 
@@ -105,16 +139,18 @@ public class DBGraph extends MatrixGraph {
     /** 向图索引中添加字段节点
      * 如果该节点为空，或者已经存在该节点则添加失败
      *
-     * @param n
+     * @param node
      * @return 是否成功添加
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean addFieldNode(Node n) {
-        if (n == null || !n.getClass().equals(FieldNode.class)) return false;
+    public boolean addFieldNode(FieldNode node) {
+        if (node == null) return false;
 
-        FieldNode node = (FieldNode)n;
         if(node.getFieldName() == null ) return false;
+
+        //已经添加过的字段节点不再添加
+        if(fieldIndex.containsKey(node.getFieldName())) return true;
         fieldIndex.put(node.getFieldName(), node);
 
         // 给字段新建一个映射List
@@ -135,24 +171,52 @@ public class DBGraph extends MatrixGraph {
         return fieldIndex.get(name);
     }
 
+    /** 移除一个字段节点
+     *
+     * @param node
+     * @return
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean removeFieldNode(FieldNode node) {
+        if (node == null || node.getFieldName() == null) return false;
+        return fieldIndex.remove(node.getFieldName()) != null;
+    }
+
 
     /**
      * 向图索引中添加表节点
      * 如果已经存在该节点，或者该节点为空则添加失败
      *
-     * @param n
+     * @param node
      * @return 是否成功添加
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean addTableNode(Node n) {
-        if (n == null || !n.getClass().equals(TableNode.class)) return false;
-
-        TableNode node = (TableNode)n;
+    public boolean addTableNode(TableNode node) {
+        if (node == null) return false;
         if(node.getTableName() == null ) return false;
+        if(allocateIndex(node) < 0)return false;
 
         tableIndex.put(node.getTableName(), node);
-        return allocateIndex(n) >= 0;
+        return true;
+    }
+
+    /** 移除一个表节点
+     *
+     * @param node
+     * @return
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean removeTableNode(TableNode node) {
+        if (node == null || node.getTableName() == null) return false;
+
+        if(removeNode(node)){
+            return tableIndex.remove(node.getTableName()) != null;
+        }
+        return false;
+
     }
 
 
@@ -173,21 +237,35 @@ public class DBGraph extends MatrixGraph {
      * 向图索引中添加粒度节点
      * 如果已经存在该节点，或者该节点为空则添加失败
      *
-     * @param n
+     * @param node
      * @return 是否成功添加
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean addGranularityNode(Node n) {
-        if (n == null || !n.getClass().equals(GranularityNode.class)) return false;
-
-        GranularityNode node = (GranularityNode)n;
+    public boolean addGranularityNode(GranularityNode node) {
+        if (node == null) return false;
         if(node.getGranularityName() == null ) return false;
 
+        if(allocateIndex(node) < 0) return false;
+
         granularityIndex.put(node.getGranularityName(), node);
-        return allocateIndex(n) >= 0;
+        return true;
     }
 
+    /** 移除一个粒度节点
+     *
+     * @param node
+     * @return
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean removeGranularityNode(GranularityNode node) {
+        if (node == null || node.getGranularityName() == null) return false;
+        if(removeNode(node)){
+            return granularityIndex.remove(node.getGranularityName()) != null;
+        }
+        return false;
+    }
 
     /**
      * 根据粒度名获取粒度节点
@@ -216,9 +294,8 @@ public class DBGraph extends MatrixGraph {
             GranularityNode gran = grans.getValue();
 
             // 获取粒度包含的字段连接的表
-            Iterator<Node> fields = gran.getFields().iterator();
-            while (fields.hasNext()) {
-                List<Node> tables = field_tables.get(fields.next());
+            for (Node field : gran.getFields()) {
+                List<Node> tables = field_tables.get(field);
                 for(Node node : tables){
                     TableNode table = (TableNode) node;
 

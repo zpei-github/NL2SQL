@@ -8,21 +8,17 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <modules.version>0.0.1-SNAPSHOT</modules.version>
     </properties>
 
     <parent>
         <groupId>com.nl2sql</groupId>
         <artifactId>nl2sql</artifactId>
-        <version>0.0.1-RELEASE</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
+
     <!-->子工程信息<!-->
-    <groupId>com.nl2sql</groupId>
     <artifactId>nl2sql-llm</artifactId>
     <name>nl2sql-llm</name>
     <packaging>jar</packaging>
-    <version>${modules.version}</version>
-
-
-
+    <version>0.0.1-SNAPSHOT</version>
 </project>

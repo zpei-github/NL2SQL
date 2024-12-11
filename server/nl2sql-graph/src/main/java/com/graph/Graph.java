@@ -136,6 +136,24 @@ public interface Graph {
      **/
     public List<Integer> extractNeighborIndex(int n);
 
+    /** 移除某个节点
+     *
+     * @param n
+     * @return 返回是否移除成功
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean removeNode(Node n);
+
+    /** 根据节点索引值移除该节点
+     *
+     * @param i
+     * @return 返回是否移除成功
+     * @author zpei
+     * @create 2024/12/11
+     **/
+    public boolean removeNode(int i);
+
     /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
      *
      * @return

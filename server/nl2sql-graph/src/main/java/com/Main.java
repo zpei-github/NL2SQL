@@ -1,6 +1,5 @@
 package com;
 
-
 import com.graph.DBGraph;
 import com.minimal_steiner_tree.MSTree;
 import com.node.Node;
@@ -8,7 +7,6 @@ import com.node.NodeFactory;
 import com.node.entity.FieldNode;
 import com.node.entity.GranularityNode;
 import com.node.entity.TableNode;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,27 +57,27 @@ public class Main {
         n17.addField(n10);
         n17.addField(n11);
 
-        graph.addTableNode(n0);
-        graph.addTableNode(n1);
-        graph.addTableNode(n2);
-        graph.addTableNode(n3);
-        graph.addTableNode(n4);
-        graph.addTableNode(n5);
-        graph.addTableNode(n6);
+        graph.add(n0);
+        graph.add(n1);
+        graph.add(n2);
+        graph.add(n3);
+        graph.add(n4);
+        graph.add(n5);
+        graph.add(n6);
 
 
-        graph.addFieldNode(n7);
-        graph.addFieldNode(n8);
-        graph.addFieldNode(n9);
-        graph.addFieldNode(n10);
-        graph.addFieldNode(n11);
+        graph.add(n7);
+        graph.add(n8);
+        graph.add(n9);
+        graph.add(n10);
+        graph.add(n11);
 
-        graph.addGranularityNode(n12);
-        graph.addGranularityNode(n13);
-        graph.addGranularityNode(n14);
-        graph.addGranularityNode(n15);
-        graph.addGranularityNode(n16);
-        graph.addGranularityNode(n17);
+        graph.add(n12);
+        graph.add(n13);
+        graph.add(n14);
+        graph.add(n15);
+        graph.add(n16);
+        graph.add(n17);
 
 
         graph.link(n0, n7, 1);
@@ -110,17 +108,24 @@ public class Main {
         graph.link(n6, n10, 1);
         graph.link(n6, n11, 1);
         graph.link(n6, n17, 2);
+
+        graph.graphPrint();
         graph.compute();
+
+        graph.graphPrint();
+
+
 
 
         mst.initial(graph);
 
         Set<Node> keys2 = new HashSet<>();
-        keys2.add(graph.findTableNode("teacher"));
+        keys2.add(graph.findTableNode("stu"));
         keys2.add(graph.findTableNode("stu_live_plans"));
 
         // mst.solve(keys1);
         mst.solve(keys2);
+
 
     }
 }

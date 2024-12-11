@@ -224,7 +224,8 @@ public class MSTree {
     private String edgeKey(int a, int b) {
         Node na = graph.index2node(a);
         Node nb = graph.index2node(b);
-        return (a < b) ? na + " ----> " + nb : nb + " ----> " + na;
+        return (a < b) ?
+                na + "(" + a + ")" + " ----> " + nb + "(" + b + ")" : nb + "(" + b + ")" + " ----> " + na + "(" + a + ")";
     }
 }
 

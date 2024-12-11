@@ -6,21 +6,19 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<modules.version>0.0.1-SNAPSHOT</modules.version>
 	</properties>
 	<parent>
 		<groupId>com.nl2sql</groupId>
 		<artifactId>nl2sql</artifactId>
-		<version>0.0.1-RELEASE</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
 
-	<groupId>com.nl2sql</groupId>
 	<artifactId>nl2sql-web</artifactId>
 	<name>nl2sql-web</name>
 	<description>Web Module</description>
 	<packaging>jar</packaging>
-	<version>${modules.version}</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -42,6 +40,40 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+			<version>2.3.4.RELEASE</version> <!-- Use the appropriate version -->
+		</dependency>
+
+		<!-- MySQL Connector -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.30</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
+		<!--Mybatis-->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+
+		<!--dashscope依赖-->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dashscope-sdk-java</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
