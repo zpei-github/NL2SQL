@@ -3,6 +3,8 @@ package com.minimal_steiner_tree;
 import com.graph.DBGraph;
 import com.graph.Graph;
 import com.node.Node;
+import com.node.entity.GranularityNode;
+import com.node.entity.TableNode;
 
 import java.util.*;
 
@@ -15,18 +17,14 @@ public class MSTree {
     private long[][] dist; // 节点对之间的最短距离
     private int[][] nextNode; // 用于重建原有的图
 
-    /** 状态压缩二维数组
-     * dp[i][s] 表示以节点i为根，包含S点集合的最小权重和
-     * 其中s是以二进制记录点集合的方式: 当 i = s时，代表节点i到自身的最小权重和0
-     */
     private Graph graph;
 
-    public MSTree(){}
+    // 输出边的节点间分割符
+    private String separator;
 
-    public MSTree(Graph graph) {
-        initial(graph);
+    public MSTree(){
+        separator = "<--->";
     }
-
 
     /** 初始化操作
      * 当图发生变化就需要进行初始化。更新图和重算节点对之间的最短路径
@@ -76,12 +74,7 @@ public class MSTree {
 
 
     private boolean keyNodesInitial(Set<Node> keyNodes, int k, long[][] dp, int[][] parent) {
-        int[] terminals = new int[k];
-        Iterator<Node> iter = keyNodes.iterator();
-        for (int i = 0; i < k; i++) {
-            Integer x = graph.node2index(iter.next());
-            terminals[i] = x;
-        }
+        Iterator<Node> iter = null;
 
         // 判断关键节点之间是否连通，不连通则直接结束初始化
         for(int i = 0; i < k; i++) {
@@ -111,15 +104,36 @@ public class MSTree {
     }
 
 
-    public boolean solve(Set<Node> keyNodes){
+    public Set<String> solve(Set<Node> keyNodes){
         int k = keyNodes.size();
+        Set<String> usedEdges = new HashSet<>();
+
+        if(k == 0) return null;
+
+        if(k == 1){
+            int i = -1;
+            for(Node node : keyNodes){
+                i = graph.node2index(node);
+                usedEdges.add(edgeKey(i, i));
+            }
+            return usedEdges;
+        }
+
+        // 状态码，通过二进制左移关键节点个数获取，可以通过一个状态码判断包含那些关键节点
         int fullMask = (1 << k) - 1;
 
+        /** 状态压缩二维数组
+         * dp[i][s] 表示以节点i为根，包含S点集合的最小权重和
+         * 其中s是以二进制记录点集合的方式: 当 i = s时，代表节点i到自身的最小权重和0
+         */
         long[][] dp = new long[n][1 << k];
+
+        /** 记录dp
+         *
+         */
         int[][] parent = new int[n][1 << k];
 
-        if(!keyNodesInitial(keyNodes, k, dp, parent)) return false;
-
+        if(!keyNodesInitial(keyNodes, k, dp, parent)) return null;
 
 
         // Dreyfus-Wagner DP
@@ -130,9 +144,10 @@ public class MSTree {
             // Try splitting S into S1 and S2
             for (int S1 = (S - 1) & S; S1 > 0; S1 = (S1 - 1) & S) {
                 int S2 = S ^ S1; // complement subset
+                long val = -1L;
                 // Merge dp states
                 for (int v = 0; v < n; v++) {
-                    long val = dp[v][S1] + dp[v][S2];
+                    val = dp[v][S1] + dp[v][S2];
                     if (val < dp[v][S]) {
                         dp[v][S] = val;
                         parent[v][S] = S1; // record splitting
@@ -171,18 +186,14 @@ public class MSTree {
             }
         }
 
-
         System.out.println("Minimum Steiner Tree weight: " + ans);
-
-        Set<String> usedEdges = new HashSet<>();
         rebuildSolution(bestV, fullMask, usedEdges, parent);
-
         // usedEdges中存放的边表示最终的斯坦纳树边集，实际需要根据重建路径函数生成(u,v)的edge对
         System.out.println("Edges in the Steiner Tree:");
         for (String e : usedEdges) {
             System.out.println(e);
         }
-        return true;
+        return usedEdges;
     }
 
     private void rebuildSolution(int v, int S, Set<String> usedEdges, int[][] parent) {
@@ -221,11 +232,17 @@ public class MSTree {
         }
     }
 
+
+    //返回边，且按照表在前，粒度在后的顺序
     private String edgeKey(int a, int b) {
         Node na = graph.index2node(a);
         Node nb = graph.index2node(b);
-        return (a < b) ?
-                na + "(" + a + ")" + " ----> " + nb + "(" + b + ")" : nb + "(" + b + ")" + " ----> " + na + "(" + a + ")";
+        if(na.getClass().equals(TableNode.class) && nb.getClass().equals(GranularityNode.class)){
+            return na + separator + nb;
+        } else if (nb.getClass().equals(TableNode.class) && na.getClass().equals(GranularityNode.class))
+        {
+            return nb + separator + na;
+        }else return null;
     }
 }
 

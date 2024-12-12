@@ -1,6 +1,8 @@
 package com;
 
+import com.node.Node;
 import com.node.NodeFactory;
+import com.node.entity.FieldNode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,7 +13,8 @@ public class NL2SQL {
 		NodeFactory nodeFactory = new NodeFactory();
 		SpringApplication.run(NL2SQL.class, args);
 		 */
-		System.out.print(String.format("%" + 9 + "s", " "));
+		Node field = new FieldNode();
+		System.out.println(field.getClass());
 
 	}
 

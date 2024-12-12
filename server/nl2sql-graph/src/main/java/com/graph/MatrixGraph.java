@@ -347,13 +347,8 @@ public abstract class MatrixGraph implements Graph {
     @Override
     public abstract boolean compute();
 
-    public void graphPrint(){
+    public void printGraph(){
         int formatLength = 10;
-        for(int i = 0; i < index2nodes.size(); i++){
-            System.out.println( index2node(i) + "(" + i +")");
-        }
-        System.out.println();
-
         System.out.print(String.format("%" + formatLength + "s", " "));
         for(Integer i = 0; i < index2nodes.size(); i++){
             System.out.print(i + String.format("%" + (formatLength - i.toString().length()) + "s", " "));
@@ -374,5 +369,12 @@ public abstract class MatrixGraph implements Graph {
             System.out.println();
             System.out.println();
         }
+    }
+
+    public void printNodeIndex(){
+        for(int i = 0; i < index2nodes.size(); i++){
+            System.out.println( index2node(i) + "(" + i +")");
+        }
+        System.out.println();
     }
 }

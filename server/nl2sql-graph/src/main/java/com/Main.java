@@ -108,24 +108,22 @@ public class Main {
         graph.link(n6, n10, 1);
         graph.link(n6, n11, 1);
         graph.link(n6, n17, 2);
-
-        graph.graphPrint();
         graph.compute();
 
-        graph.graphPrint();
 
+        graph.printFields();
+        graph.printGraph();
 
 
 
         mst.initial(graph);
 
         Set<Node> keys2 = new HashSet<>();
-        keys2.add(graph.findTableNode("stu"));
-        keys2.add(graph.findTableNode("stu_live_plans"));
+        keys2.add(graph.findFieldNode("plan_id"));
+        keys2.add(graph.findFieldNode("tea_id"));
 
+        // System.out.println(graph.field2table(keys2));
         // mst.solve(keys1);
-        mst.solve(keys2);
-
-
+        mst.solve(graph.fieldInvertedTable(keys2));
     }
 }

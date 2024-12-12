@@ -19,14 +19,14 @@ public class DBGraph extends MatrixGraph {
 
 
     // 名字索引节点map
-    private final Map<String, FieldNode> fieldIndex;
-    private final Map<String, GranularityNode> granularityIndex;
-    private final Map<String, TableNode> tableIndex;
+    public final Map<String, FieldNode> fieldIndex;
+    public final Map<String, GranularityNode> granularityIndex;
+    public final Map<String, TableNode> tableIndex;
 
     /** 字段-表map
      * key 为字段，List为存在该字段的表的集合
      */
-    private final Map<Node, List<Node>> field_tables;
+     final Map<Node, List<Node>> field_tables;
 
 
     public DBGraph() {
@@ -322,4 +322,86 @@ public class DBGraph extends MatrixGraph {
         }
         return true;
     }
+
+    /** 倒排索引确认需要求解的表
+     *
+     * @param nodes
+     * @return 求解的表set
+     * @author zpei
+     * @create 2024/12/12
+     **/
+    public Set<Node> fieldInvertedTable(Set<Node> nodes){
+        if(nodes == null || nodes.isEmpty()) return null;
+        Set<Node> keyNodes = new HashSet<>();
+        invertedIndex(keyNodes, field_tables, nodes, fieldIndex);
+        return keyNodes;
+    }
+
+
+    /** 递归倒排索引获取目标表节点
+     *
+     * @param
+     * @return
+     * @author zpei
+     * @create 2024/12/12
+     **/
+    private void invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex){
+        if(nodes.isEmpty()) return;
+        HashMap<Node, List<Node>> index = new HashMap<>();
+        int max = 0;
+        Map.Entry<Node, List<Node> > maxEntry = null;
+
+        for(Node node : nodes){
+            if(node.getClass().equals(FieldNode.class)){
+                FieldNode field = (FieldNode) node;
+                if(!fieldIndex.containsKey(field.getFieldName()) || field_tables.get(field).isEmpty()) {
+                    nodes.remove(node);
+                    continue;
+                }
+                for(Node table : field_tables.get(field)){
+                    if(!index.containsKey(table)){
+                        index.put(table, new ArrayList<>());
+                    }
+                    index.get(table).add(node);
+                }
+            }else {
+                if(!node.getClass().equals(TableNode.class) && !node.getClass().equals(GranularityNode.class)) continue;
+                keyNodes.add(node);
+                nodes.remove(node);
+            }
+        }
+
+        for(Map.Entry<Node, List<Node>> entry : index.entrySet()){
+            int size = entry.getValue().size();
+            if(size > max){
+                max = size;
+                maxEntry = entry;
+            }
+        }
+
+        for(Node node : maxEntry.getValue()){
+            nodes.remove(node);
+        }
+        keyNodes.add(maxEntry.getKey());
+        invertedIndex(keyNodes, field_tables, nodes, fieldIndex);
+    }
+
+    /** 打印字段与表关系
+     *
+     * @return
+     * @author zpei
+     * @create 2024/12/12
+     **/
+    public void printFields(){
+        for(Map.Entry<Node, List<Node>> entry : field_tables.entrySet()){
+            FieldNode field = (FieldNode) entry.getKey();
+            System.out.print(field.getFieldName() + " <--> ");
+            for(Node node : entry.getValue()){
+                TableNode table = (TableNode) node;
+                System.out.print(table + " ");
+            }
+            System.out.println();
+        }
+    }
+
 }
