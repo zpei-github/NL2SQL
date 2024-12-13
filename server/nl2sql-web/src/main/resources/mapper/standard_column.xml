@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.multiLLM.mapper.admin.AdminMapper">
-    <select id="findAdminByName" resultType="com.multiLLM.entity.admin.Administrator">
-        SELECT id,
-               admin_name as name,
-               password,
-               account_enable as accountEnabled,
-               salt,
-               deleted
-        FROM admins
-        WHERE admin_name = #{name}
+<mapper namespace="com.web.mapper.standard_database.StandardColumnMapper">
+    <select id="getAllStandardColumn" resultType="com.web.entity.StandardColumn">
+        SELECT
+            *
+        FROM
+            standard_column
+        WHERE
+            standard_column_name IS NOT NULL
     </select>
 </mapper>

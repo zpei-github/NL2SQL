@@ -13,12 +13,16 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node;
 
-import java.util.Set;
+package com.web;
 
-/** 图的节点接口
- */
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public interface Node {
+@SpringBootApplication
+public class NL2SQL {
+	public static void main(String[] args) {
+		SpringApplication.run(NL2SQL.class, args);
+	}
+
 }

@@ -13,12 +13,34 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node;
+package com.web.service;
 
-import java.util.Set;
+import com.graph.DBGraph;
+import com.minimal_steiner_tree.MSTree;
+import com.node.NodeFactory;
+import lombok.Getter;
 
-/** 图的节点接口
+/** 图生成
+ *
  */
+public class GraphMaker {
 
-public interface Node {
+    @Getter
+    private NodeFactory nodeFactory;
+
+    @Getter
+    private DBGraph graph;
+
+    @Getter
+    private MSTree treeSolver;
+
+
+
+    public GraphMaker() {
+        nodeFactory = new NodeFactory();
+        graph = new DBGraph();
+        treeSolver = new MSTree();
+    }
+
+
 }

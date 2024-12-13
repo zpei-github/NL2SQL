@@ -25,6 +25,7 @@
 			<groupId>com.nl2sql</groupId>
 			<artifactId>nl2sql-graph</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.nl2sql</groupId>
 			<artifactId>nl2sql-llm</artifactId>
@@ -44,7 +45,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
-			<version>2.3.4.RELEASE</version> <!-- Use the appropriate version -->
+			<version>2.3.4.RELEASE</version>
+		</dependency>
+
+		<!-- Spring Boot Starter Data JPA -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
 		<!-- MySQL Connector -->
@@ -53,6 +60,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.30</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
@@ -72,7 +80,18 @@
 			<version>2.9.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.12.3</version>
+		</dependency>
 
+		<!-- Jackson Databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.12.3</version>
+		</dependency>
 
 	</dependencies>
 

@@ -39,6 +39,7 @@
 				<artifactId>nl2sql-graph</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
+
 			<dependency>
 				<groupId>com.nl2sql</groupId>
 				<artifactId>nl2sql-llm</artifactId>

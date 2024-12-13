@@ -13,12 +13,13 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node;
+package com.web.mapper.standard_database;
+import com.web.entity.StandardColumn;
+import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Set;
+import java.util.List;
 
-/** 图的节点接口
- */
-
-public interface Node {
+@Mapper
+public interface StandardColumnMapper {
+    List<StandardColumn> getAllStandardColumn();
 }

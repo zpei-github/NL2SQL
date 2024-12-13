@@ -13,12 +13,13 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node;
 
-import java.util.Set;
+package com.web.mapper.standard_database;
+import com.web.entity.StandardGranularityColumn;
+import org.apache.ibatis.annotations.Mapper;
+import java.util.List;
 
-/** 图的节点接口
- */
-
-public interface Node {
+@Mapper
+public interface StandardGranularityColumnMapper {
+    List<StandardGranularityColumn> getAllStandardGranularityColumn();
 }
