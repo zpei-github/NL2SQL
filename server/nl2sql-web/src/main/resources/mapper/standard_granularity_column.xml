@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.standard_database.StandardGranularityColumnMapper">
-    <select id="getAllStandardGranularityColumn" resultType="com.web.entity.StandardGranularityColumn">
+    <select id="getAllStandardGranularityColumn" resultType="com.web.entity.standard_database.StandardGranularityColumn">
         SELECT
             *
         FROM
             standard_granularity_column
-        WHERE
-            granularity_name IS NOT NULL
-            AND standard_column_name IS NOT NULL
     </select>
 
 

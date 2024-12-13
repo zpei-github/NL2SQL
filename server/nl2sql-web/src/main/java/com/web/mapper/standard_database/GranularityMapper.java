@@ -13,34 +13,16 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.web.service;
 
-import com.graph.DBGraph;
-import com.minimal_steiner_tree.MSTree;
-import com.node.NodeFactory;
-import lombok.Getter;
-
-/** 图生成
- *
- */
-public class GraphMaker {
-
-    @Getter
-    private NodeFactory nodeFactory;
-
-    @Getter
-    private DBGraph graph;
-
-    @Getter
-    private MSTree treeSolver;
+package com.web.mapper.standard_database;
 
 
+import com.web.entity.standard_database.Granularity;
+import org.apache.ibatis.annotations.Mapper;
 
-    public GraphMaker() {
-        nodeFactory = new NodeFactory();
-        graph = new DBGraph();
-        treeSolver = new MSTree();
-    }
+import java.util.List;
 
-
+@Mapper
+public interface GranularityMapper {
+    List<Granularity> getAllGranularity();
 }

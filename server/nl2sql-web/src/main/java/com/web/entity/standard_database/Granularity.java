@@ -14,10 +14,11 @@
  *   limitations under the License.
  */
 
-package com.web.entity;
+package com.web.entity.standard_database;
 
 
 import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,27 +28,17 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "standard_column_table")
-public class StandardColumnTable {
-
+@Table(name = "granularity")
+public class Granularity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "standard_column_table_id")
-    private Integer standardColumnTableId; // 主键id
+    @Column(name = "granularity_id")
+    private Integer granularityId; // 主键id
 
-    @Column(name = "standard_table_name", nullable = false)
-    private String standardTableName; // 标准表名
+    @Column(name = "granularit_name", nullable = false)
+    private String granularitName; // 粒度名
 
-    @Column(name = "standard_column_name", nullable = false)
-    private String standardColumnName; // 标准字段名
-
-    @Column(name = "table_schema", nullable = false)
-    private String tableSchema; // 所属源库
-
-    @Column(name = "original_table_name", nullable = false)
-    private String originalTableName; // 源库表名
-
-    @Column(name = "original_column_name", nullable = false)
-    private String originalColumnName; // 源库字段名
+    @Column(name = "granularity_comment", nullable = false)
+    private String granularityComment; // 粒度备注
 }
 

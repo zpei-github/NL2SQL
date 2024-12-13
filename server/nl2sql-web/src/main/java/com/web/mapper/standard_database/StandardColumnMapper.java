@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 package com.web.mapper.standard_database;
-import com.web.entity.StandardColumn;
+import com.web.entity.standard_database.StandardColumn;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

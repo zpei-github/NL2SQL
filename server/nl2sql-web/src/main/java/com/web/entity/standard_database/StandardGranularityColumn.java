@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.web.entity;
+package com.web.entity.standard_database;
 
 
 import lombok.Data;
@@ -33,8 +33,11 @@ public class StandardGranularityColumn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "granularity_column_id")
+    private Integer GranularityColumnId;
+
     @Column(name = "granularity_id")
-    private Integer granularityId; // 主键id
+    private Integer granularityId; // 粒度id
 
     @Column(name = "granularity_name", nullable = false)
     private String granularityName; // 粒度名
@@ -42,10 +45,9 @@ public class StandardGranularityColumn {
     @Column(name = "standard_column_name")
     private String standardColumnName; // 标准字段名
 
-    @Column(name = "origional_column_name", nullable = false)
-    private String origionalColumnName; // 源库字段名
+    @Column(name = "standard_column_id")
+    private Integer standardColumnId; // 标准字段id
 
-    @Column(name = "granularity_comment", nullable = false)
-    private String granularityComment; // 粒度备注
+
 }
 

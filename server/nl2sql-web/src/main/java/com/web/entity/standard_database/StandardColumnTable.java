@@ -14,7 +14,9 @@
  *   limitations under the License.
  */
 
-package com.web.entity;
+package com.web.entity.standard_database;
+
+
 import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,29 +27,24 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "standard_table")
-public class StandardTable {
+@Table(name = "standard_column_table")
+public class StandardColumnTable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "standard_table_id")
+    @Column(name = "standard_column_table_id")
+    private Integer standardColumnTableId; // 主键id
+
+    @Column(name = "standard_table_name", nullable = false)
+    private String standardTableName; // 标准表名
+
+    @Column(name = "standard_column_name", nullable = false)
+    private String standardColumnName; // 标准字段名
+
+    @Column(name = "standard_column_id" , nullable = false)
+    private Integer standardColumnId; // 标准字段id
+
+    @Column(name = "standard_table_id", nullable = false)
     private Integer standardTableId; // 标准规范表id
-
-    @Column(name = "original_table_name", nullable = false)
-    private String originalTableName; // 源库表名
-
-    @Column(name = "standard_table_name")
-    private String standardTableName; // 标准规范表名
-
-    @Column(name = "table_schema", nullable = false)
-    private String tableSchema; // 源库名
-
-    @Column(name = "table_comment", nullable = false)
-    private String tableComment; // 表备注
-
-    @Column(name = "column_rows")
-    private Integer columnRows; // 表数据量
-
-    @Column(name = "granularity_name")
-    private String granularityName; // 表的粒度
 }
 

@@ -33,14 +33,14 @@ public class DBGraph extends MatrixGraph {
 
 
     // 名字索引节点map
-    public final Map<String, FieldNode> fieldIndex;
-    public final Map<String, GranularityNode> granularityIndex;
-    public final Map<String, TableNode> tableIndex;
+    private final Map<String, FieldNode> fieldIndex;
+    private final Map<String, GranularityNode> granularityIndex;
+    private final Map<String, TableNode> tableIndex;
 
     /** 字段-表map
      * key 为字段，List为存在该字段的表的集合
      */
-     final Map<Node, List<Node>> field_tables;
+    private final Map<Node, List<Node>> field_tables;
 
 
     public DBGraph() {
@@ -161,10 +161,9 @@ public class DBGraph extends MatrixGraph {
     public boolean addFieldNode(FieldNode node) {
         if (node == null) return false;
 
-        if(node.getFieldName() == null ) return false;
+        if(node.getFieldName() == null || fieldIndex.containsKey(node.getFieldName())) return false;
 
         //已经添加过的字段节点不再添加
-        if(fieldIndex.containsKey(node.getFieldName())) return true;
         fieldIndex.put(node.getFieldName(), node);
 
         // 给字段新建一个映射List
@@ -209,7 +208,7 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean addTableNode(TableNode node) {
         if (node == null) return false;
-        if(node.getTableName() == null ) return false;
+        if(node.getTableName() == null || tableIndex.containsKey(node.getTableName())) return false;
         if(allocateIndex(node) < 0)return false;
 
         tableIndex.put(node.getTableName(), node);
@@ -258,7 +257,8 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean addGranularityNode(GranularityNode node) {
         if (node == null) return false;
-        if(node.getGranularityName() == null ) return false;
+        if(node.getGranularityName() == null || granularityIndex.containsKey(node.getGranularityName())) return false;
+
 
         if(allocateIndex(node) < 0) return false;
 
@@ -292,6 +292,7 @@ public class DBGraph extends MatrixGraph {
     public GranularityNode findGranularityNode(String name) {
         return granularityIndex.get(name);
     }
+
 
     /** 当图添加节点完毕之后需要连接所有粒度和具有相关字段的表
      * 若粒度g1，g1包含f1和f2两个字段。需要将g1连接至所有包含f1和f2的表t2, t3, t4...
@@ -338,7 +339,8 @@ public class DBGraph extends MatrixGraph {
     }
 
     /** 倒排索引确认需要求解的表
-     *
+     * 在建立好的图中，求解最小斯坦纳树应该主要关注表节点和粒度节点，字段可以通过倒排索引聚集到数量较少的几张表中
+     * 多个字段节点可能指向同一张表，因此通过倒排索引递归得出包含字段最多的单张表，从而大大降低斯坦树求解的关键节点数量
      * @param nodes
      * @return 求解的表set
      * @author zpei

@@ -6,7 +6,7 @@ mybatis:
 
 spring:
   datasource:
-    url: jdbc:mysql://${mysql.ip}/nl2sql_standard_database
-    username: ${mysql.user}
-    password: ${mysql.password}
+    url: jdbc:mysql://${docker.mysql.ip}/nl2sql_standard_database
+    username: ${docker.mysql.user}
+    password: ${docker.mysql.password}
     driverClassName: com.mysql.cj.jdbc.Driver

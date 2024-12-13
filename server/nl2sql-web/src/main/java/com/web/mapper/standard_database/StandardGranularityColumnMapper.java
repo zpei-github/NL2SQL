@@ -15,7 +15,7 @@
  */
 
 package com.web.mapper.standard_database;
-import com.web.entity.StandardGranularityColumn;
+import com.web.entity.standard_database.StandardGranularityColumn;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

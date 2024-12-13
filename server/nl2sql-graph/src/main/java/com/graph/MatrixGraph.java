@@ -17,12 +17,6 @@ package com.graph;
 
 
 import com.node.Node;
-import com.node.entity.FieldNode;
-import com.node.entity.GranularityNode;
-import com.node.entity.TableNode;
-import com.sun.xml.internal.ws.util.StringUtils;
-import lombok.Getter;
-
 import java.util.*;
 
 
@@ -144,13 +138,15 @@ public abstract class MatrixGraph implements Graph {
 
         int n1neighborCount = graph.get(n1index).size();
         int n2neighborCount = graph.get(n2index).size();
-        int nodesCount = index2nodes.size();
+        int indexLength = index2nodes.size();
+
+
 
         // 在连接节点时，扩展节点的邻接List
-        for(; n1neighborCount < nodesCount; n1neighborCount ++){
+        for(; n1neighborCount < indexLength; n1neighborCount ++){
             graph.get(n1index).add(null);
         }
-        for(; n2neighborCount < nodesCount; n2neighborCount ++){
+        for(; n2neighborCount < indexLength; n2neighborCount ++){
             graph.get(n2index).add(null);
         }
 
@@ -256,7 +252,10 @@ public abstract class MatrixGraph implements Graph {
      **/
     @Override
     public boolean removeNode(int i) {
-        if(i >= index2nodes.size() || index2node(i) == null) return false;
+        if(i >= index2nodes.size()) return false;
+        Node n = index2nodes.get(i);
+        if(n == null) return false;
+
 
         // 将连接解除
         graph.get(i).replaceAll(ignored -> null);
@@ -266,7 +265,7 @@ public abstract class MatrixGraph implements Graph {
             }
         }
 
-        if(node2index.remove(index2node(i)) != null){
+        if(node2index.remove(n) != null){
             index2nodes.set(i, null);
             vacantIndexes.add(i);
             return true;
