@@ -13,12 +13,9 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node.entity;
+package com.node.nodes;
 
 import com.node.Node;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 
 /** 节点抽象类

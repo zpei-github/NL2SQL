@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.web.mapper.standard_database.StandardColumnMapper">
-    <select id="getAllStandardColumn" resultType="com.web.entity.standard_database.StandardColumn">
+<mapper namespace="com.web.mapper.mysql.standard_database.StandardColumnMapper">
+    <select id="getAllStandardColumn" resultType="com.web.entity.mysql.standard_database.StandardColumn">
         SELECT
             *
         FROM

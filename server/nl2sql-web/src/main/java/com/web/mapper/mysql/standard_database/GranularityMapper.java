@@ -13,13 +13,16 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.web.mapper.standard_database;
-import com.web.entity.standard_database.StandardColumnTable;
+
+package com.web.mapper.mysql.standard_database;
+
+
+import com.web.entity.mysql.standard_database.Granularity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
-public interface StandardColumnTableMapper {
-    List<StandardColumnTable> getAllStandardColumnTable();
+public interface GranularityMapper {
+    List<Granularity> getAllGranularity();
 }

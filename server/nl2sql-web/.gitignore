@@ -1,4 +1,4 @@
-nl2sql-web/HELP.md
+HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

@@ -15,9 +15,9 @@
  */
 package com.node;
 
-import com.node.entity.FieldNode;
-import com.node.entity.GranularityNode;
-import com.node.entity.TableNode;
+import com.node.nodes.FieldNode;
+import com.node.nodes.GranularityNode;
+import com.node.nodes.TableNode;
 
 public class NodeFactory {
     public NodeFactory() {}

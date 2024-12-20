@@ -17,16 +17,17 @@ package com.web.service.graph;
 
 import com.graph.DBGraph;
 import com.minimal_steiner_tree.MSTree;
-import com.node.entity.FieldNode;
-import com.node.entity.GranularityNode;
-import com.node.entity.TableNode;
-import com.web.entity.standard_database.*;
-import com.web.mapper.standard_database.*;
+import com.node.nodes.FieldNode;
+import com.node.nodes.GranularityNode;
+import com.node.nodes.TableNode;
+import com.web.entity.mysql.standard_database.*;
+import com.web.mapper.elasticserach.StandardColumnRepository;
+import com.web.mapper.elasticserach.StandardTableRepository;
+import com.web.mapper.mysql.standard_database.*;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /** 图生成
@@ -56,6 +57,12 @@ public class GraphService {
 
     @Autowired
     private StandardGranularityColumnMapper granColMapper;
+
+    @Autowired
+    private StandardTableRepository tableRepo;
+
+    @Autowired
+    private StandardColumnRepository colRepo;
 
     private GraphService() {
         graph = new DBGraph();
@@ -87,19 +94,19 @@ public class GraphService {
         treeSolver.initial(graph);
     }
 
-
     @PostConstruct
     public void postConstruct() {
         // 在bean初始化后自动调用initialize()方法
         initialize();
-        graph.printGraph();
     }
 
     private boolean addColumns() {
         List<StandardColumn> columns = columnMapper.getAllStandardColumn();
         if (columns == null || columns.isEmpty()) { return false; }
         for (StandardColumn column : columns) {
+            // 图添加字段
             graph.add(new FieldNode(column.getStandardColumnName()));
+
         }
         return true;
     }
@@ -124,6 +131,7 @@ public class GraphService {
         List<StandardTable> tables = tableMapper.getAllStandardTables();
         if (tables == null || tables.isEmpty()) return false;
         for (StandardTable table : tables) {
+            // 图添加表
             TableNode tableNode = new TableNode(table.getStandardTableName());
             tableNode.setGranularity(graph.findGranularityNode(table.getGranularityName()));
             graph.add(tableNode);

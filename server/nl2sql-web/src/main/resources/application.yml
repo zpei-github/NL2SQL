@@ -10,3 +10,10 @@ spring:
     username: ${docker.mysql.user}
     password: ${docker.mysql.password}
     driverClassName: com.mysql.cj.jdbc.Driver
+
+  elasticsearch:
+    rest:
+      uris: http://${docker.mysql.ip}:9200
+    socket-timeout: "10s"
+    username: ${docker.elasticsearch.user}
+    password: ${docker.elasticsearch.password}

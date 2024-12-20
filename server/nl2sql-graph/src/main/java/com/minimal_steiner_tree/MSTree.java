@@ -15,11 +15,10 @@
  */
 package com.minimal_steiner_tree;
 
-import com.graph.DBGraph;
 import com.graph.Graph;
 import com.node.Node;
-import com.node.entity.GranularityNode;
-import com.node.entity.TableNode;
+import com.node.nodes.GranularityNode;
+import com.node.nodes.TableNode;
 
 import java.util.*;
 

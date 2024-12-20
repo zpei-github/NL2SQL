@@ -15,9 +15,9 @@
  */
 package com.graph;
 import com.node.Node;
-import com.node.entity.FieldNode;
-import com.node.entity.GranularityNode;
-import com.node.entity.TableNode;
+import com.node.nodes.FieldNode;
+import com.node.nodes.GranularityNode;
+import com.node.nodes.TableNode;
 import java.util.*;
 
 
@@ -86,7 +86,6 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean add(Node n){
         if (n == null) return false;
-
         if(n.getClass().equals(FieldNode.class)){
             return addFieldNode((FieldNode) n);
         }else if(n.getClass().equals(TableNode.class)){
@@ -321,7 +320,7 @@ public class DBGraph extends MatrixGraph {
                     }
 
                     if(tableCounts.containsKey(table)){
-                        tableCounts.put(table, tableCounts.get(table) + 1);
+                        tableCounts.replace(table, tableCounts.get(table) + 1);
                     }else
                         tableCounts.put(table, 1);
                 }
@@ -419,5 +418,4 @@ public class DBGraph extends MatrixGraph {
             System.out.println();
         }
     }
-
 }

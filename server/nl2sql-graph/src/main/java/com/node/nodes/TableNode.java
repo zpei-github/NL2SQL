@@ -13,47 +13,58 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.node.entity;
-import lombok.Getter;
-import lombok.Setter;
+package com.node.nodes;
+
+
+import java.lang.Object;
 import java.util.Objects;
 
-/** 字段节点
- * 用于存储字段信息的节点, 其邻居节点都是表节点
+import com.node.Node;
+import lombok.Getter;
+import lombok.Setter;
+
+/** 表节点
+ * 表节点用于存储表的信息, 包含表名和粒度信息
+ *
  *
  *
  * */
+
 @Setter
 @Getter
-public class FieldNode extends AbstractNode {
-    private String fieldName;
+public class TableNode extends AbstractNode {
+    private String tableName;
+    private Node granularity;
 
-    public FieldNode() {}
+    public TableNode() {
+        this(null);
+    }
 
-    public FieldNode(String fieldName) {
-        this.fieldName = fieldName;
+    public TableNode(String tableName) {
+        this.tableName = tableName;
     }
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法
     @Override
     public boolean equals(Object o) {
         // 对象类型不匹配
-        if (o == null || !this.getClass().equals(o.getClass()) ) return false;
+        if (null == o || !this.getClass().equals(o.getClass()) ) return false;
 
-        FieldNode o1 = (FieldNode) o;
-        if (this.fieldName == null){
-            return o1.getFieldName() == null;
+        TableNode o1 = (TableNode) o;
+
+        if(this.tableName == null) {
+            return o1.getTableName() == null;
         }
-        return this.fieldName.equals(o1.getFieldName());
+        return this.tableName.equals(o1.getTableName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash("FiledNode" + this.fieldName);
+        return Objects.hash("TableNode" + this.tableName);
     }
 
     @Override
     public String toString() {
-        return "FieldNode@@" + this.fieldName;
+        return "TableNode@@" + this.tableName;
     }
 }
