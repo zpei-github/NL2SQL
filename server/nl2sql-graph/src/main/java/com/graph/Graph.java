@@ -27,6 +27,7 @@ import java.util.List;
  */
 
 public interface Graph {
+
     /** 将节点添加到图中，并给节点n分配唯一的索引值index
      * 在图中所有的节点需要有一个固定的索引值index，方便索引和创建邻接矩阵
      * @param n
@@ -101,15 +102,6 @@ public interface Graph {
      **/
     public Integer getWeight(Node n1, Node n2);
 
-    /** 根据两节点的索引查询权重
-     *
-     * @param i1
-     * @param i2
-     * @return 节点间权重
-     * @author zpei
-     * @create 2024/12/7
-     **/
-    public Integer getWeight(int i1, int i2);
 
     /** 判断两个节点是否连接
      * 如果两个节点不是互为邻居或不存在权重，则看作两个节点没有连接
@@ -121,15 +113,8 @@ public interface Graph {
      **/
     public boolean isLinked(Node n1, Node n2);
 
-    /** 根据索引值判断两个节点是否连接
-     * 如果两个节点不是互为邻居或不存在权重，则看作两个节点没有连接
-     * @param i1
-     * @param i2
-     * @return 是否连接
-     * @author zpei
-     * @create 2024/12/7
-     **/
-    public boolean isLinked(int i1, int i2);
+
+
 
     /** 获取指定节点的邻居节点List
      *
@@ -141,15 +126,6 @@ public interface Graph {
     public List<Node> extractNeighbors(Node n);
 
 
-    /** 获取指定节点的邻居节点索引值List
-     *
-     * @param n
-     * @return 邻居节点的索引值List
-     * @author zpei
-     * @create 2024/12/5
-     **/
-    public List<Integer> extractNeighborIndex(int n);
-
     /** 移除某个节点
      *
      * @param n
@@ -159,14 +135,16 @@ public interface Graph {
      **/
     public boolean removeNode(Node n);
 
-    /** 根据节点索引值移除该节点
+
+    /** 获取节点的度
      *
-     * @param i
-     * @return 返回是否移除成功
+     * @param n
+     * @return 度
      * @author zpei
-     * @create 2024/12/11
+     * @create 2024/12/25
      **/
-    public boolean removeNode(int i);
+    public Integer getDegree(Node n);
+
 
     /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
      *

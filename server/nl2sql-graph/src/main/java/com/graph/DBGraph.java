@@ -337,6 +337,7 @@ public class DBGraph extends MatrixGraph {
         return true;
     }
 
+
     /** 倒排索引确认需要求解的表
      * 在建立好的图中，求解最小斯坦纳树应该主要关注表节点和粒度节点，字段可以通过倒排索引聚集到数量较少的几张表中
      * 多个字段节点可能指向同一张表，因此通过倒排索引递归得出包含字段最多的单张表，从而大大降低斯坦树求解的关键节点数量
@@ -364,7 +365,7 @@ public class DBGraph extends MatrixGraph {
         if(nodes.isEmpty()) return;
         HashMap<Node, List<Node>> index = new HashMap<>();
         int max = 0;
-        Map.Entry<Node, List<Node> > maxEntry = null;
+        Node maxTable = null;
 
         for(Node node : nodes){
             if(node.getClass().equals(FieldNode.class)){
@@ -373,11 +374,18 @@ public class DBGraph extends MatrixGraph {
                     nodes.remove(node);
                     continue;
                 }
+
+                // 将字段节点分配到表节点下
                 for(Node table : field_tables.get(field)){
                     if(!index.containsKey(table)){
                         index.put(table, new ArrayList<>());
                     }
                     index.get(table).add(node);
+
+                    if(index.get(table).size() > max){
+                        max = index.get(table).size();
+                        maxTable = table;
+                    }
                 }
             }else {
                 if(!node.getClass().equals(TableNode.class) && !node.getClass().equals(GranularityNode.class)) continue;
@@ -385,21 +393,13 @@ public class DBGraph extends MatrixGraph {
                 nodes.remove(node);
             }
         }
-
-        for(Map.Entry<Node, List<Node>> entry : index.entrySet()){
-            int size = entry.getValue().size();
-            if(size > max){
-                max = size;
-                maxEntry = entry;
-            }
-        }
-
-        for(Node node : maxEntry.getValue()){
+        for(Node node : index.get(maxTable)){
             nodes.remove(node);
         }
-        keyNodes.add(maxEntry.getKey());
+        keyNodes.add(maxTable);
         invertedIndex(keyNodes, field_tables, nodes, fieldIndex);
     }
+
 
     /** 打印字段与表关系
      *

@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.mysql.standard_database.StandardGranularityColumnMapper">
-    <select id="getAllStandardGranularityColumn" resultType="com.web.entity.mysql.standard_database.StandardGranularityColumn">
+    <!-- ResultMap 映射 -->
+    <resultMap id="StandardGranularityColumnResultMap" type="com.web.entity.mysql.standard_database.StandardGranularityColumn">
+        <id property="granularityColumnId" column="granularity_column_id"/>
+        <result property="granularityId" column="granularity_id"/>
+        <result property="granularityName" column="granularity_name"/>
+        <result property="standardColumnName" column="standard_column_name"/>
+        <result property="standardColumnId" column="standard_column_id"/>
+    </resultMap>
+
+    <select id="getAllStandardGranularityColumn" resultMap="StandardGranularityColumnResultMap">
         SELECT
-            *
+            granularity_column_id,
+            granularity_id,
+            granularity_name,
+            standard_column_name,
+            standard_column_id
         FROM
             standard_granularity_column
     </select>

@@ -16,6 +16,7 @@
 package com.minimal_steiner_tree;
 
 import com.graph.Graph;
+import com.graph.MatrixGraph;
 import com.node.Node;
 import com.node.nodes.GranularityNode;
 import com.node.nodes.TableNode;
@@ -31,7 +32,7 @@ public class MSTree {
     private long[][] dist; // 节点对之间的最短距离
     private int[][] nextNode; // 用于重建原有的图
 
-    private Graph graph;
+    private MatrixGraph graph;
 
     // 输出边的节点间分割符
     private String separator;
@@ -47,7 +48,7 @@ public class MSTree {
      * @author zpei
      * @create 2024/12/8
      **/
-    public void initial(Graph graph) {
+    public void initial(MatrixGraph graph) {
         this.graph = graph;
         this.n = graph.getNodeCount();
         dist = new long[n][n];
@@ -148,7 +149,6 @@ public class MSTree {
         int[][] parent = new int[n][1 << k];
 
         if(!keyNodesInitial(keyNodes, k, dp, parent)) return null;
-
 
         // Dreyfus-Wagner DP
         for (int S = 1; S <= fullMask; S++) {

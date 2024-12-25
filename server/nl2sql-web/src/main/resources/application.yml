@@ -1,19 +1,21 @@
 server:
   port: 18888
 
+logging:
+  level:
+    org.springframework.boot.context.config: DEBUG
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
 spring:
   datasource:
-    url: jdbc:mysql://${docker.mysql.ip}/nl2sql_standard_database
-    username: ${docker.mysql.user}
-    password: ${docker.mysql.password}
+    url: jdbc:mysql://${docker_mysql_ip}/nl2sql_standard_database
+    username: ${docker_mysql_user}
+    password: ${docker_mysql_password}
     driverClassName: com.mysql.cj.jdbc.Driver
-
   elasticsearch:
-    rest:
-      uris: http://${docker.mysql.ip}:9200
-    socket-timeout: "10s"
-    username: ${docker.elasticsearch.user}
-    password: ${docker.elasticsearch.password}
+    host: ${docker_elasticsearch_ip}
+    port: 9200
+    username: ${docker_elasticsearch_user}
+    password: ${docker_elasticsearch_password}

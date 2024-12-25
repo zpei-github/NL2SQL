@@ -16,11 +16,16 @@
 package com.node.nodes;
 
 import com.node.Node;
+import lombok.Getter;
+import lombok.Setter;
 
 
 /** 节点抽象类
  * 节点使用HashMap储存邻居节点的信息，包括指向的节点与距离该节点的距离
  *
  * */
+@Setter
+@Getter
 public abstract class AbstractNode implements Node {
+    protected String schema;
 }

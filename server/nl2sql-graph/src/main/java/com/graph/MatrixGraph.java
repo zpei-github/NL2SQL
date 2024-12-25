@@ -20,7 +20,6 @@ import com.node.Node;
 import java.util.*;
 
 
-
 // 可动态扩展的邻接矩阵图
 public abstract class MatrixGraph implements Graph {
     // 节点位置信息map，节点总数等于map的size
@@ -63,6 +62,14 @@ public abstract class MatrixGraph implements Graph {
         if(!vacantIndexes.isEmpty()){
             nodeIndex = vacantIndexes.removeLast();
             index2nodes.set(nodeIndex, n);
+
+            // 将旧的连接解除
+            graph.get(nodeIndex).replaceAll(ignored -> null);
+            for(int x = 0; x < graph.size(); x ++){
+                if(nodeIndex < graph.get(x).size()){
+                    graph.get(x).set(nodeIndex, null);
+                }
+            }
         }else {
             // 将节点添加到node数组
             index2nodes.add(n);
@@ -76,11 +83,11 @@ public abstract class MatrixGraph implements Graph {
             }
         }
 
-        // 创建n的索引
-        node2index.put(n, nodeIndex);
-
         // 自己到自己的节点距离为0
         graph.get(nodeIndex).set(nodeIndex, 0);
+
+        // 创建n的索引
+        node2index.put(n, nodeIndex);
 
         return nodeIndex;
     }
@@ -115,14 +122,12 @@ public abstract class MatrixGraph implements Graph {
     }
 
 
-    /**
-     * 连接两个节点并赋权值
-     * 权值一定不能为空。如果成功连接两个节点并赋权值则返回true, 否则返回false
-     * 图为无向有权图，所以需要双向赋权
+    /** 连接两个节点并赋权值
+     *
      * @param n1
      * @param n2
      * @param weight
-     * @return 是否成功连接
+     * @return
      * @author zpei
      * @create 2024/12/5
      **/
@@ -133,14 +138,32 @@ public abstract class MatrixGraph implements Graph {
         // 节点需要有索引，否则无法连接两个节点
         Integer n1index = node2index(n1);
         Integer n2index = node2index(n2);
+        return link(n1index, n2index, weight);
+    }
 
-        if (n1index == null || n2index == null || isLinked(n1index, n2index)) return false;
 
+    /** 根据索引连接两个节点并赋权值
+     * 权值一定不能为空。如果成功连接两个节点并赋权值则返回true, 否则返回false
+     * 图为无向有权图，所以需要双向赋权
+     * @param n1index
+     * @param n2index
+     * @param weight
+     * @return 是否成功连接
+     * @author zpei
+     * @create 2024/12/25
+     **/
+    private boolean link(Integer n1index, Integer n2index, Integer weight){
+        if (n1index == null
+                || n2index == null
+                || n1index >= index2nodes.size()
+                || n2index >= index2nodes.size()
+                || index2nodes.get(n1index) == null
+                || index2nodes.get(n2index) == null
+                || weight == null
+                || isLinked(n1index, n2index)) return false;
         int n1neighborCount = graph.get(n1index).size();
         int n2neighborCount = graph.get(n2index).size();
         int indexLength = index2nodes.size();
-
-
 
         // 在连接节点时，扩展节点的邻接List
         for(; n1neighborCount < indexLength; n1neighborCount ++){
@@ -173,7 +196,7 @@ public abstract class MatrixGraph implements Graph {
         Integer n1index = node2index(n1);
         Integer n2index = node2index(n2);
 
-        // 判断是否添加到索引以及是否越界
+        // 判断是否添加到索引
         if (n1index == null || n2index == null ) return -2;
         return getWeight(n1index, n2index);
     }
@@ -188,9 +211,12 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    @Override
     public Integer getWeight(int i1, int i2) {
-        if(i1 >= graph.size() || i2 >= graph.get(i1).size()) return null;
+        if(i1 >= graph.size()
+                || i2 >= graph.get(i1).size()
+                || index2nodes.get(i1) == null
+                || index2nodes.get(i2) == null
+        ) return null;
         return graph.get(i1).get(i2);
     }
 
@@ -223,7 +249,6 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    @Override
     public boolean isLinked(int i1, int i2) {
         return getWeight(i1, i2) != null;
     }
@@ -250,21 +275,12 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/11
      **/
-    @Override
     public boolean removeNode(int i) {
         if(i >= index2nodes.size()) return false;
         Node n = index2nodes.get(i);
         if(n == null) return false;
 
-
-        // 将连接解除
-        graph.get(i).replaceAll(ignored -> null);
-        for(int x = 0; x < graph.size(); x ++){
-            if(i < graph.get(x).size()){
-                graph.get(x).set(i, null);
-            }
-        }
-
+        // 软删除，仅删除索引到节点和节点到索引的映射
         if(node2index.remove(n) != null){
             index2nodes.set(i, null);
             vacantIndexes.add(i);
@@ -272,6 +288,42 @@ public abstract class MatrixGraph implements Graph {
         }
         return false;
     }
+
+    /**
+     *
+     * @param n
+     * @return
+     * @author zpei
+     * @create 2024/12/25
+     **/
+    @Override
+    public Integer getDegree(Node n) {
+        if(n == null || !node2index.containsKey(n)) return null;
+
+        Integer nIndex = node2index.get(n);
+        if(nIndex == null) return null;
+
+        return getDegree(nIndex);
+    }
+
+
+    /** 获取某个索引值节点的度
+     *
+     * @param nodeIndex
+     * @return 度
+     * @author zpei
+     * @create 2024/12/25
+     **/
+    public Integer getDegree(int nodeIndex) {
+        if(nodeIndex >= index2nodes.size() || index2nodes.get(nodeIndex) == null) return null;
+
+        Integer degree = 0;
+        for(int i = 0; i < graph.get(nodeIndex).size(); i++){
+            if(graph.get(nodeIndex).get(i) != null && i != nodeIndex) degree++;
+        }
+        return degree;
+    }
+
 
     /**
      * 获取指定节点的邻居节点List
@@ -284,7 +336,7 @@ public abstract class MatrixGraph implements Graph {
     @Override
     public List<Node> extractNeighbors(Node n) {
         if(n == null) return null;
-        Integer nodeIndex = node2index(n);
+        Integer nodeIndex = node2index.get(n);
 
         if(nodeIndex == null) return null;
         List<Node> neighbors = new ArrayList<>();
@@ -303,9 +355,8 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/5
      **/
-    @Override
     public List<Integer> extractNeighborIndex(int n) {
-        if(n >= index2nodes.size()) return null;
+        if(n >= index2nodes.size() || index2nodes.get(n) == null) return null;
 
         List<Integer> result = new ArrayList<>();
         for(int i = 0; i < graph.get(n).size(); i++){
@@ -332,15 +383,28 @@ public abstract class MatrixGraph implements Graph {
                 || n2 == null
                 || weight == null
                 || n1.equals(n2)
-                || !isLinked(n1, n2)
         ) return false;
+        Integer node1Index = node2index(n1);
+        Integer node2Index = node2index(n2);
+        if(node1Index == null || node2Index == null) return false;
+        return updateWeight(node1Index, node2Index, weight);
+    }
 
-        int node1Index = node2index(n1);
-        int node2Index = node2index(n2);
 
+    /** 根据两节点索引更新节点间权重
+     *
+     * @param n1
+     * @param n2
+     * @param weight
+     * @return
+     * @author zpei
+     * @create 2024/12/25
+     **/
+    public boolean updateWeight(int n1, int n2, Integer weight){
+        if(n1 == n2 || weight == null || !isLinked(n1, n2)) return false;
         // 无向图需要双向修改
-        graph.get(node1Index).set(node2Index, weight);
-        graph.get(node2Index).set(node1Index, weight);
+        graph.get(n1).set(n2, weight);
+        graph.get(n2).set(n1, weight);
         return true;
     }
 
@@ -355,6 +419,7 @@ public abstract class MatrixGraph implements Graph {
         return node2index.size();
     }
 
+
     /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
      *
      * @return
@@ -363,6 +428,7 @@ public abstract class MatrixGraph implements Graph {
      **/
     @Override
     public abstract boolean compute();
+
 
     public void printGraph(){
         int formatLength = 10;
@@ -387,6 +453,7 @@ public abstract class MatrixGraph implements Graph {
             System.out.println();
         }
     }
+
 
     public void printNodeIndex(){
         for(int i = 0; i < index2nodes.size(); i++){

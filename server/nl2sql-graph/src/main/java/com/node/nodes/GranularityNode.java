@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.Set;
 
 
-
 /** 粒度节点
  * 粒度节点存储粒度的信息, 节点中有粒度覆盖的字段的信息。
  * 粒度节点的邻居节点都是表节点

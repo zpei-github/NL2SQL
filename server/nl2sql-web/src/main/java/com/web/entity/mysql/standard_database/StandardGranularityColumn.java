@@ -33,19 +33,14 @@ public class StandardGranularityColumn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "granularity_column_id")
     private Integer GranularityColumnId;
 
-    @Column(name = "granularity_id")
     private Integer granularityId; // 粒度id
 
-    @Column(name = "granularity_name", nullable = false)
     private String granularityName; // 粒度名
 
-    @Column(name = "standard_column_name")
     private String standardColumnName; // 标准字段名
 
-    @Column(name = "standard_column_id")
     private Integer standardColumnId; // 标准字段id
 
 

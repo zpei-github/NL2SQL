@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.mysql.standard_database.GranularityMapper">
-    <select id="getAllGranularity" resultType="com.web.entity.mysql.standard_database.Granularity">
+    <!-- 显式映射查询结果到实体 -->
+    <resultMap id="granularityResultMap" type="com.web.entity.mysql.standard_database.Granularity">
+        <result property="granularityId" column="granularity_id"/>
+        <result property="granularityName" column="granularity_name"/>
+        <result property="granularityComment" column="granularity_comment"/>
+    </resultMap>
+
+    <select id="getAllGranularity" resultMap="granularityResultMap">
         SELECT
-            *
+            granularity_id,
+            granularity_name,
+            granularity_comment
         FROM
-            standard_column
+            granularity
     </select>
 </mapper>

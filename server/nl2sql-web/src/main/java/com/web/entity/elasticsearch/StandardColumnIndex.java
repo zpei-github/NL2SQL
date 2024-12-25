@@ -1,17 +1,20 @@
 package com.web.entity.elasticsearch;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Data
-@Document(indexName = "standardColumnIndex")
+@NoArgsConstructor
+@AllArgsConstructor
 public class StandardColumnIndex {
+    private Integer standard_column_id;
 
-    @Id
-    private Integer standardColumnId;
+    private String standard_column_name;
 
-    private String standardColumnName;
+    private String column_comment; // 字段备注
 
-    private String columnComment; // 字段备注
+    private String table_schema;
 }

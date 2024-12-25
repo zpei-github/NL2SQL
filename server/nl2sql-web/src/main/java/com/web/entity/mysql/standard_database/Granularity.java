@@ -19,26 +19,20 @@ package com.web.entity.mysql.standard_database;
 
 import lombok.Data;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "granularity")
 public class Granularity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "granularity_id")
     private Integer granularityId; // 主键id
 
-    @Column(name = "granularit_name", nullable = false)
-    private String granularitName; // 粒度名
+    private String granularityName; // 粒度名
 
-    @Column(name = "granularity_comment", nullable = false)
     private String granularityComment; // 粒度备注
 }
 

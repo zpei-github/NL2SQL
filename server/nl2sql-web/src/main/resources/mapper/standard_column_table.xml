@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.mysql.standard_database.StandardColumnTableMapper">
-    <select id="getAllStandardColumnTable" resultType="com.web.entity.mysql.standard_database.StandardColumnTable">
+    <!-- ResultMap 映射 -->
+    <resultMap id="StandardColumnTableResultMap" type="com.web.entity.mysql.standard_database.StandardColumnTable">
+        <id property="standardColumnTableId" column="standard_column_table_id"/>
+        <result property="standardTableName" column="standard_table_name"/>
+        <result property="standardColumnName" column="standard_column_name"/>
+        <result property="standardColumnId" column="standard_column_id"/>
+        <result property="standardTableId" column="standard_table_id"/>
+    </resultMap>
+
+    <select id="getAllStandardColumnTable" resultMap="StandardColumnTableResultMap">
         SELECT
-            *
+            standard_column_table_id,
+            standard_table_name,
+            standard_column_name,
+            standard_column_id,
+            standard_table_id
         FROM
             standard_column_table
     </select>

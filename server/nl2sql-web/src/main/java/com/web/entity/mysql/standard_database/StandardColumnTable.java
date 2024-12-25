@@ -27,24 +27,18 @@ import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "standard_column_table")
 public class StandardColumnTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "standard_column_table_id")
     private Integer standardColumnTableId; // 主键id
 
-    @Column(name = "standard_table_name", nullable = false)
     private String standardTableName; // 标准表名
 
-    @Column(name = "standard_column_name", nullable = false)
     private String standardColumnName; // 标准字段名
 
-    @Column(name = "standard_column_id" , nullable = false)
     private Integer standardColumnId; // 标准字段id
 
-    @Column(name = "standard_table_id", nullable = false)
     private Integer standardTableId; // 标准规范表id
 }
 

@@ -26,24 +26,18 @@ import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "standard_column")
 public class StandardColumn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "standard_column_id")
     private Integer standardColumnId; // 标准字段id
 
-    @Column(name = "standard_column_name")
     private String standardColumnName; // 标准表名
 
-    @Column(name = "original_column_name", nullable = false)
     private String originalColumnName; // 源库字段名
 
-    @Column(name = "column_comment", nullable = false)
     private String columnComment; // 字段备注
 
-    @Column(name = "table_schema", nullable = false)
     private String tableSchema; // 源库名
 }
 
