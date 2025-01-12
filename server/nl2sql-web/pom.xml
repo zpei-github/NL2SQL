@@ -27,6 +27,11 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
 
 		<!-- 引用同项目其他模块，无需版本号，使用父工程管理 -->
 		<dependency>
@@ -73,13 +78,6 @@
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>3.0.2</version>
-		</dependency>
-
-		<!-- dashscope依赖(第三方库，不受Spring Boot管理，可保持原版本或检查兼容性) -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>dashscope-sdk-java</artifactId>
-			<version>2.9.2</version>
 		</dependency>
 
 		<dependency>

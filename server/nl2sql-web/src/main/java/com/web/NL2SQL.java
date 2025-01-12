@@ -26,5 +26,4 @@ public class NL2SQL {
 	public static void main(String[] args) {
 		SpringApplication.run(NL2SQL.class, args);
 	}
-
 }

@@ -28,4 +28,20 @@
         FROM
             standard_table
     </select>
+
+    <select id="getStandardTableByStandardTableName" parameterType="String" resultMap="StandardTableResultMap">
+        SELECT
+            standard_table_id,
+            original_table_name,
+            standard_table_name,
+            table_schema,
+            table_comment,
+            column_rows,
+            granularity_name,
+            granularity_id
+        FROM
+            standard_table
+        WHERE
+            standard_table_name = #{name}
+    </select>
 </mapper>

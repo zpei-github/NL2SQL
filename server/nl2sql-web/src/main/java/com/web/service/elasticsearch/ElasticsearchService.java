@@ -6,6 +6,8 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.web.entity.elasticsearch.StandardColumnIndex;
 import com.web.entity.elasticsearch.StandardTableIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticsearchService {
 
+    private static final Logger log = LoggerFactory.getLogger(ElasticsearchService.class);
     @Autowired
     private ElasticsearchClient client;
 
@@ -41,7 +44,7 @@ public class ElasticsearchService {
             }
             return response.result().name();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return "Error";
         }
     }
@@ -57,7 +60,7 @@ public class ElasticsearchService {
 
             return response.source();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -87,7 +90,7 @@ public class ElasticsearchService {
                     .map(Hit::source)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -114,7 +117,7 @@ public class ElasticsearchService {
                     .map(Hit::source)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }

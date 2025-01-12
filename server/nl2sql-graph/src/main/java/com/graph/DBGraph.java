@@ -14,10 +14,10 @@
  *   limitations under the License.
  */
 package com.graph;
-import com.node.Node;
-import com.node.nodes.FieldNode;
-import com.node.nodes.GranularityNode;
-import com.node.nodes.TableNode;
+import com.graph.node.Node;
+import com.graph.node.nodes.FieldNode;
+import com.graph.node.nodes.GranularityNode;
+import com.graph.node.nodes.TableNode;
 import java.util.*;
 
 
@@ -349,7 +349,8 @@ public class DBGraph extends MatrixGraph {
     public Set<Node> fieldInvertedTable(Set<Node> nodes){
         if(nodes == null || nodes.isEmpty()) return null;
         Set<Node> keyNodes = new HashSet<>();
-        invertedIndex(keyNodes, field_tables, nodes, fieldIndex);
+        List<Node> tmp = new LinkedList<>();
+        invertedIndex(keyNodes, field_tables, nodes, fieldIndex, tmp);
         return keyNodes;
     }
 
@@ -361,13 +362,13 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/12
      **/
-    private void invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex){
+    private void invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex, List<Node> tmp){
         if(nodes.isEmpty()) return;
         HashMap<Node, List<Node>> index = new HashMap<>();
         int max = 0;
         Node maxTable = null;
 
-        for(Node node : nodes){
+        for(Node node: nodes){
             if(node.getClass().equals(FieldNode.class)){
                 FieldNode field = (FieldNode) node;
                 if(!fieldIndex.containsKey(field.getFieldName()) || field_tables.get(field).isEmpty()) {
@@ -390,14 +391,18 @@ public class DBGraph extends MatrixGraph {
             }else {
                 if(!node.getClass().equals(TableNode.class) && !node.getClass().equals(GranularityNode.class)) continue;
                 keyNodes.add(node);
-                nodes.remove(node);
+                tmp.add(node);
             }
         }
         for(Node node : index.get(maxTable)){
             nodes.remove(node);
         }
+        for(Node node : tmp){
+            nodes.remove(node);
+        }
+        tmp.clear();
         keyNodes.add(maxTable);
-        invertedIndex(keyNodes, field_tables, nodes, fieldIndex);
+        invertedIndex(keyNodes, field_tables, nodes, fieldIndex, tmp);
     }
 
 

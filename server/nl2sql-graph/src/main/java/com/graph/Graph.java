@@ -16,7 +16,7 @@
 package com.graph;
 
 
-import com.node.Node;
+import com.graph.node.Node;
 import java.util.List;
 
 

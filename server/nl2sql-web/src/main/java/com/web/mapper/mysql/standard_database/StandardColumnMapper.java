@@ -22,4 +22,5 @@ import java.util.List;
 @Mapper
 public interface StandardColumnMapper {
     List<StandardColumn> getAllStandardColumn();
+    StandardColumn getStandardColumnByStandardColumnName(String name);
 }

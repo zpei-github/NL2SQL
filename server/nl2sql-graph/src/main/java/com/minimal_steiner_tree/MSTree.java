@@ -15,11 +15,12 @@
  */
 package com.minimal_steiner_tree;
 
-import com.graph.Graph;
+import com.graph.Edge;
+import com.graph.MatrixEdge;
 import com.graph.MatrixGraph;
-import com.node.Node;
-import com.node.nodes.GranularityNode;
-import com.node.nodes.TableNode;
+import com.graph.node.Node;
+import com.graph.node.nodes.GranularityNode;
+import com.graph.node.nodes.TableNode;
 
 import java.util.*;
 
@@ -34,11 +35,8 @@ public class MSTree {
 
     private MatrixGraph graph;
 
-    // 输出边的节点间分割符
-    private String separator;
 
     public MSTree(){
-        separator = "<--->";
     }
 
     /** 初始化操作
@@ -118,19 +116,27 @@ public class MSTree {
         return true;
     }
 
-
-    public Set<String> solve(Set<Node> keyNodes){
+    /**
+     *
+     * @param keyNodes 关键节点
+     * @return 返回最小斯坦纳树的边集合。其中边的格式为表节点在前，粒度节点在后
+     * @author zpei
+     * @create 2025/1/8
+     **/
+    public Set<Edge> solve(Set<Node> keyNodes){
         int k = keyNodes.size();
-        Set<String> usedEdges = new HashSet<>();
+        Set<Edge> usedEdges = new HashSet<>();
 
         if(k == 0) return null;
 
         if(k == 1){
             int i = -1;
+            Edge e = new MatrixEdge();
             for(Node node : keyNodes){
-                i = graph.node2index(node);
-                usedEdges.add(edgeKey(i, i));
+                e.setStart(node);
+                e.setEnd(node);
             }
+            usedEdges.add(e);
             return usedEdges;
         }
 
@@ -199,18 +205,12 @@ public class MSTree {
                 bestV = v;
             }
         }
-
-        System.out.println("Minimum Steiner Tree weight: " + ans);
         rebuildSolution(bestV, fullMask, usedEdges, parent);
         // usedEdges中存放的边表示最终的斯坦纳树边集，实际需要根据重建路径函数生成(u,v)的edge对
-        System.out.println("Edges in the Steiner Tree:");
-        for (String e : usedEdges) {
-            System.out.println(e);
-        }
         return usedEdges;
     }
 
-    private void rebuildSolution(int v, int S, Set<String> usedEdges, int[][] parent) {
+    private void rebuildSolution(int v, int S, Set<Edge> usedEdges, int[][] parent) {
         int p = parent[v][S];
         if (p == -1) {
             // base case, no parent means either a single terminal or no improvement
@@ -232,13 +232,13 @@ public class MSTree {
         }
     }
 
-    private void addPath(int u, int v, Set<String> usedEdges) {
+    private void addPath(int u, int v, Set<Edge> usedEdges) {
         if (u == v) return;
         int w = nextNode[u][v];
         if (w == -1) {
             // 没有中间节点，说明(u,v)直接构成最短路径的一条边
             // 根据Floyd-Warshall的实现，这里通常意味着u和v之间是直接相连的最短路径边
-            usedEdges.add(edgeKey(u, v));
+            usedEdges.add(edge(u, v));
         } else {
             // 存在中间节点w，需要分解成两条路径: u->w 和 w->v
             addPath(u, w, usedEdges);
@@ -248,15 +248,21 @@ public class MSTree {
 
 
     //返回边，且按照表在前，粒度在后的顺序
-    private String edgeKey(int a, int b) {
+    private Edge edge(int a, int b) {
         Node na = graph.index2node(a);
         Node nb = graph.index2node(b);
+        Edge edge = new MatrixEdge();
         if(na.getClass().equals(TableNode.class) && nb.getClass().equals(GranularityNode.class)){
-            return na + separator + nb;
+            edge.setStart(na);
+            edge.setEnd(nb);
+            return edge;
         } else if (nb.getClass().equals(TableNode.class) && na.getClass().equals(GranularityNode.class))
         {
-            return nb + separator + na;
-        }else return null;
+            edge.setStart(nb);
+            edge.setEnd(na);
+            return edge;
+        }else
+            return null;
     }
 }
 
