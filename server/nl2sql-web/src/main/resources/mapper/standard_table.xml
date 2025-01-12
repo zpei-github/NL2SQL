@@ -12,6 +12,7 @@
         <result property="columnRows" column="column_rows"/>
         <result property="granularityName" column="granularity_name"/>
         <result property="granularityId" column="granularity_id"/>
+        <result property="originalTableDDL" column="original_table_ddl"/>
     </resultMap>
 
 
@@ -24,12 +25,13 @@
             table_comment,
             column_rows,
             granularity_name,
-            granularity_id
+            granularity_id,
+            original_table_ddl
         FROM
             standard_table
     </select>
 
-    <select id="getStandardTableByStandardTableName" parameterType="String" resultMap="StandardTableResultMap">
+    <select id="getStandardTableByOriginalTableName" parameterType="String" resultMap="StandardTableResultMap">
         SELECT
             standard_table_id,
             original_table_name,
@@ -38,7 +40,8 @@
             table_comment,
             column_rows,
             granularity_name,
-            granularity_id
+            granularity_id,
+            original_table_ddl
         FROM
             standard_table
         WHERE

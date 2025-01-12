@@ -21,5 +21,5 @@ import java.util.List;
 @Mapper
 public interface StandardTableMapper {
     List<StandardTable> getAllStandardTables();
-    StandardTable getStandardTableByStandardTableName(String name);
+    StandardTable getStandardTableByOriginalTableName(String name);
 }

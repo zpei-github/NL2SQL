@@ -9,7 +9,6 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
-import com.alibaba.dashscope.utils.Constants;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.web.constant.ProjectConstant;
 import com.web.vo.MyMessage;
@@ -23,17 +22,14 @@ import java.util.List;
 public class LLMService {
     public MyMessage response(MyMessage question, List<MyMessage> existMessages, String model) throws Exception {
         MyMessage response = new MyMessage();
-
         List<Message> tongyiMessages = new ArrayList<>();
-        tongyiMessages.add(createMessage(Role.SYSTEM, "你是一个智能助手，你需要将我指定的SQL查询需求找出查询的表名关键字和字段名关键字并按照指定格式输出，只能从需求中获取表名和字段名关键字，不可以添加额外的内容。格式如下：" +
-                "表名关键字:[表1],[表2]...\n" +
-                "字段名关键字:[字段1],[字段2]..."));
         for (MyMessage m : existMessages) {
             if (m.getSender().equals(ProjectConstant.USER_SENDER)) {
                 tongyiMessages.add(createMessage(Role.USER, m.getContent()));
-            }
-            if (m.getSender().equals(ProjectConstant.CLIENT_SENDER)) {
+            }else if (m.getSender().equals(ProjectConstant.CLIENT_SENDER)) {
                 tongyiMessages.add(createMessage(Role.ASSISTANT, m.getContent()));
+            } else if(m.getSender().equals(ProjectConstant.SYSTEM_SENDER)){
+                tongyiMessages.add(createMessage(Role.SYSTEM, m.getContent()));
             }
         }
         tongyiMessages.add(createMessage(Role.USER, question.getContent()));

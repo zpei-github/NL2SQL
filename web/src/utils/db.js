@@ -8,6 +8,7 @@ export default {
         return new Promise((resolve, reject) => {
             const request = window.indexedDB.open(this.dbName, 1);
 
+
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => {
                 this.db = e.target.result;

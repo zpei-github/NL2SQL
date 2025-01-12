@@ -10,7 +10,8 @@
       </div>
       <div class="chat-input">
         <ChatInput :sendMessage="sendMessage"
-                   :newChat="handleNewChat"/>
+                   :newChat="handleNewChat"
+                   :getSQL="getSQL"/>
       </div>
     </div>
   </div>
@@ -32,7 +33,7 @@ export default {
       messages: []
     };
   },
-  
+
   async mounted() {
     await db.initDB();
     this.loadMessages();
@@ -96,6 +97,31 @@ export default {
       } catch (error) {
         console.error("Error creating new chat:", error);
         this.$message.error("Error creating new chat:", error.message);
+      }
+    },
+
+    async getSQL() {
+      try {
+        const my_question = {
+          messageId: this.messages.length + 1,
+          sender: "user",
+          uuid: null,
+          content: "现在需要你结合关键字和本地数据库得出SQL",
+          createTime: Date.now()};
+
+        let response1 = await http.post("/chat/get_sql", {
+          question:my_question,
+          existMessages:this.messages});
+
+        if(response1.data){
+          this.messages.push(my_question);
+          this.messages.push(response1.data);
+          await db.addChat(my_question);
+          await db.addChat(response1.data);
+        };
+      } catch (error) {
+        console.error("Error get sql:", error);
+        this.$message.error("Error get sql:", error.message);
       }
     }
   }

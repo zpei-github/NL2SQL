@@ -3,6 +3,7 @@
     <button class="new-chat-btn" @click="new_chat">新的聊天</button>
     <input type="text" v-model="userInput" @keyup.enter="send" placeholder="请输入...">
     <button class="send-btn" @click="send">发送</button>
+    <button class="send-btn" @click="get_sql">SQL</button>
   </div>
 </template>
 
@@ -11,7 +12,8 @@ export default {
   name: "ChatInput",
   props: {
     sendMessage: Function,
-    newChat: Function
+    newChat: Function,
+    getSQL: Function,
   },
   data() {
     return {
@@ -25,6 +27,9 @@ export default {
     },
     new_chat() {
       this.newChat();
+    },
+    get_sql() {
+      this.getSQL();
     }
   }
 };

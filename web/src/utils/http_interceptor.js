@@ -3,7 +3,7 @@ import axios from 'axios';
 // 创建axios实例
 const http = axios.create({
     baseURL: '/api', // 你的API基地址
-    timeout: 10000, // 请求超时时间
+    timeout: 20000, // 请求超时时间
 });
 
 http.interceptors.response.use(

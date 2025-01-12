@@ -44,5 +44,7 @@ public class StandardTable {
     private String granularityName; // 表的粒度
 
     private Integer granularityId; // 粒度id
+
+    private String originalTableDDL; //表的建表语句
 }
 
