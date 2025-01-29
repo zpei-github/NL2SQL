@@ -1,0 +1,52 @@
+version: "3.4"
+services:
+    mysql:
+        container_name: multillm-mysql
+        image: mysql:8.0.30
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE:-multillm}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-1235689.}
+        volumes:
+            - mysql:/var/lib/mysql/
+            - ./sql:/docker-entrypoint-initdb.d
+        networks:
+            - my_network
+            
+    server:
+        container_name: multillm-server
+        build:
+            context: ./server/
+        image: multillm-server
+        restart: unless-stopped
+        ports:
+            - "18888:18888"
+        networks:
+            - my_network
+        environment:
+            JAVA_OPTS: ${JAVA_OPTS:- -Xms512m -Xmx512m -Djava.security.egd=file:/dev/./urandom}
+            ARGS: --spring.datasource.url=${DATASOURCE_URL:-jdbc:mysql://multillm-mysql:3306/multillm?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true} --spring.datasource.username=${DATASOURCE_USERNAME:-root} --spring.datasource.password=${DATASOURCE_PASSWORD:-1235689.}
+        depends_on:
+            - mysql
+    web:
+        container_name: multillm-web
+        build:
+            context: ./web
+        image: multillm-web
+        restart: unless-stopped
+        ports:
+            - "80:80"
+        networks:
+            - my_network
+        depends_on:
+            - server
+volumes:
+  mysql:  # 修改此行以匹配服务部分的引用
+    driver: local
+
+networks:
+    my_network:
+        driver: bridge
