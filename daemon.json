@@ -1,0 +1,4 @@
+{
+  "registry-mirrors": ["http://hub-mirror.c.163.com","https://cr.console.aliyun.com", "https://registry.docker-cn.com"],
+  "data-root": "/opt/docker"
+}
