@@ -2,7 +2,7 @@
   <div class="user-input">
     <button class="new-chat-btn" @click="new_chat">新的聊天</button>
     <input type="text" v-model="userInput" @keyup.enter="send" placeholder="请输入...">
-    <button class="send-btn" @click="send">发送</button>
+    <button class="send-btn" @click="send">关键字</button>
     <button class="send-btn" @click="get_sql">SQL</button>
   </div>
 </template>
@@ -29,7 +29,8 @@ export default {
       this.newChat();
     },
     get_sql() {
-      this.getSQL();
+      this.getSQL(this.userInput);
+      this.userInput = ''; // 清空输入框
     }
   }
 };

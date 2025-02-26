@@ -33,4 +33,18 @@
         WHERE
             standard_column = #{name}
     </select>
+
+    <select id="getStandardColumnByStandardColumnId" parameterType="Integer" resultMap="standardColumnResultMap">
+        SELECT
+            standard_column_id,
+            standard_column_name,
+            original_column_name,
+            column_comment,
+            table_schema
+        FROM
+            standard_column
+        WHERE
+            standard_column_id = #{standardColumnId}
+    </select>
+
 </mapper>

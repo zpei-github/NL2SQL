@@ -18,6 +18,10 @@ import com.graph.node.Node;
 import com.graph.node.nodes.FieldNode;
 import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
+import com.graph.self_exceptions.IndexOutOfBoundsException;
+import com.graph.self_exceptions.NoIndexException;
+import com.graph.self_exceptions.TwoNodeOperateException;
+
 import java.util.*;
 
 
@@ -61,7 +65,7 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/9
      **/
     @Override
-    public boolean link(Node n1, Node n2 , Integer weight){
+    public boolean link(Node n1, Node n2 , Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
         if (n1 == null || n2 == null || weight == null) return false;
 
         if (n1.getClass().equals(FieldNode.class) && n2.getClass().equals(TableNode.class)) {
@@ -103,7 +107,7 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean remove(Node n){
+    public boolean remove(Node n) throws NoIndexException, IndexOutOfBoundsException{
         if (n == null) return false;
         if(n.getClass().equals(FieldNode.class)){
             return removeFieldNode((FieldNode) n);
@@ -144,7 +148,7 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/9
      **/
-    public boolean link_table_granularity(TableNode table, GranularityNode gran, Integer weight){
+    public boolean link_table_granularity(TableNode table, GranularityNode gran, Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
         return super.link(table, gran, weight);
     }
 
@@ -205,10 +209,11 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean addTableNode(TableNode node) {
+    public boolean addTableNode(TableNode node){
         if (node == null) return false;
         if(node.getTableName() == null || tableIndex.containsKey(node.getTableName())) return false;
-        if(allocateIndex(node) < 0)return false;
+
+        allocateIndex(node);
 
         tableIndex.put(node.getTableName(), node);
         return true;
@@ -221,11 +226,11 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeTableNode(TableNode node) {
+    public boolean removeTableNode(TableNode node) throws NoIndexException, IndexOutOfBoundsException {
         if (node == null || node.getTableName() == null) return false;
 
-        if(removeNode(node)){
-            return tableIndex.remove(node.getTableName()) != null;
+        if(removeNode(node)) {
+                return tableIndex.remove(node.getTableName()) != null;
         }
         return false;
 
@@ -254,12 +259,11 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean addGranularityNode(GranularityNode node) {
+    public boolean addGranularityNode(GranularityNode node){
         if (node == null) return false;
         if(node.getGranularityName() == null || granularityIndex.containsKey(node.getGranularityName())) return false;
 
-
-        if(allocateIndex(node) < 0) return false;
+        allocateIndex(node);
 
         granularityIndex.put(node.getGranularityName(), node);
         return true;
@@ -272,7 +276,7 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeGranularityNode(GranularityNode node) {
+    public boolean removeGranularityNode(GranularityNode node) throws NoIndexException, IndexOutOfBoundsException{
         if (node == null || node.getGranularityName() == null) return false;
         if(removeNode(node)){
             return granularityIndex.remove(node.getGranularityName()) != null;
@@ -301,7 +305,7 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/9
      **/
     @Override
-    public boolean compute() {
+    public boolean compute() throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException{
         Map<TableNode, Integer> tableCounts = new HashMap<>();
         for (Map.Entry<String, GranularityNode> grans : granularityIndex.entrySet()) {
             int fieldCount = grans.getValue().fieldCount();
@@ -315,7 +319,10 @@ public class DBGraph extends MatrixGraph {
 
                     // 如果表的粒度和该粒度恰好是一样的，则进行满连接
                     if(table.getGranularity().equals(gran)){
+
+                        // throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException
                         link_table_granularity(table, gran, FULL_GRANULARITY_TABLE_WEIGHT);
+
                         continue;
                     }
 
@@ -346,63 +353,100 @@ public class DBGraph extends MatrixGraph {
      * @author zpei
      * @create 2024/12/12
      **/
-    public Set<Node> fieldInvertedTable(Set<Node> nodes){
+    public Set<Node> fieldInvertToTable(Set<Node> nodes){
         if(nodes == null || nodes.isEmpty()) return null;
+
+        // 倒排索引后得到的表节点集合
         Set<Node> keyNodes = new HashSet<>();
-        List<Node> tmp = new LinkedList<>();
-        invertedIndex(keyNodes, field_tables, nodes, fieldIndex, tmp);
-        return keyNodes;
+
+        // 倒排索引-字段节点记录表
+        HashMap<Node, List<Node>> record = new HashMap<>();
+
+        // 倒排索引-打分表
+        HashMap<Node, Double> score = new HashMap<>();
+
+
+        // 挑出关键字集合中的表和粒度节点
+        for(Node node : nodes){
+            if(node instanceof TableNode || node instanceof GranularityNode){
+                keyNodes.add(node);
+
+            }
+        }
+
+        for(Node node : keyNodes){
+            nodes.remove(node);
+        }
+
+        return invertedIndex(keyNodes, field_tables, nodes, fieldIndex, record, score);
     }
 
 
-    /** 递归倒排索引获取目标表节点
+    /** 递归倒排索引打分获取目标表节点
+     * 倒排索引打分可以自定义
      *
      * @param
      * @return
      * @author zpei
      * @create 2024/12/12
      **/
-    private void invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex, List<Node> tmp){
-        if(nodes.isEmpty()) return;
-        HashMap<Node, List<Node>> index = new HashMap<>();
-        int max = 0;
+    private Set<Node> invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex, HashMap<Node, List<Node>> record, HashMap<Node, Double> score){
+        if(nodes.isEmpty()) return keyNodes;
+
+        double max = 0d;
         Node maxTable = null;
 
         for(Node node: nodes){
-            if(node.getClass().equals(FieldNode.class)){
-                FieldNode field = (FieldNode) node;
-                if(!fieldIndex.containsKey(field.getFieldName()) || field_tables.get(field).isEmpty()) {
-                    nodes.remove(node);
-                    continue;
-                }
+            if(!(node instanceof FieldNode)) continue;
+            FieldNode field = (FieldNode) node;
 
-                // 将字段节点分配到表节点下
-                for(Node table : field_tables.get(field)){
-                    if(!index.containsKey(table)){
-                        index.put(table, new ArrayList<>());
-                    }
-                    index.get(table).add(node);
+            if(!fieldIndex.containsKey(field.getFieldName()) || field_tables.get(field).isEmpty()) {
+                nodes.remove(node);
+                continue;
+            }
 
-                    if(index.get(table).size() > max){
-                        max = index.get(table).size();
-                        maxTable = table;
-                    }
+            // 将字段节点涉及到的表添加到打分表中
+            for(Node table : field_tables.get(field)){
+                if(!record.containsKey(table)){
+                    record.put(table, new ArrayList<>());
                 }
-            }else {
-                if(!node.getClass().equals(TableNode.class) && !node.getClass().equals(GranularityNode.class)) continue;
-                keyNodes.add(node);
-                tmp.add(node);
+                record.get(table).add(node);
+
+
+                if(!score.containsKey(table)){
+                    score.put(table, 0d);
+                }
+                double s = 10d;
+
+                TableNode t1 = (TableNode) table;
+                TableNode t2 = (TableNode) maxTable;
+
+                // 倒排索引打分策略1: 如果字段属于表粒度，则加2分
+                GranularityNode granOfT1 = (GranularityNode) t1.getGranularity();
+                if(granOfT1.getFields().contains(field)) s += 2d;
+
+                // 倒排索引打分策略2: 数据量评价
+                s += Math.log10(t1.getRowCount()) / 10;
+
+
+                score.put(table, score.get(table) + s);
+
+                if(score.get(table) > max){
+                    max = score.get(table);
+                    maxTable = table;
+                }
             }
         }
-        for(Node node : index.get(maxTable)){
+
+        for(Node node : record.get(maxTable)){
             nodes.remove(node);
         }
-        for(Node node : tmp){
-            nodes.remove(node);
-        }
-        tmp.clear();
+
+        record.clear();
+        score.clear();
         keyNodes.add(maxTable);
-        invertedIndex(keyNodes, field_tables, nodes, fieldIndex, tmp);
+
+        return invertedIndex(keyNodes, field_tables, nodes, fieldIndex, record, score);
     }
 
 

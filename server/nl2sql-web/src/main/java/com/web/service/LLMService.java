@@ -30,21 +30,20 @@ import com.web.vo.MyMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class LLMService {
     public MyMessage response(MyMessage question, List<MyMessage> existMessages, String model) throws Exception {
         MyMessage response = new MyMessage();
+
         List<Message> tongyiMessages = new ArrayList<>();
+
         for (MyMessage m : existMessages) {
-            if (m.getSender().equals(ProjectConstant.USER_SENDER)) {
-                tongyiMessages.add(createMessage(Role.USER, m.getContent()));
-            }else if (m.getSender().equals(ProjectConstant.CLIENT_SENDER)) {
-                tongyiMessages.add(createMessage(Role.ASSISTANT, m.getContent()));
-            } else if(m.getSender().equals(ProjectConstant.SYSTEM_SENDER)){
-                tongyiMessages.add(createMessage(Role.SYSTEM, m.getContent()));
+            switch (m.getSender()) {
+                case ProjectConstant.USER_SENDER -> tongyiMessages.add(createMessage(Role.USER, m.getContent()));
+                case ProjectConstant.CLIENT_SENDER -> tongyiMessages.add(createMessage(Role.ASSISTANT, m.getContent()));
+                case ProjectConstant.SYSTEM_SENDER -> tongyiMessages.add(createMessage(Role.SYSTEM, m.getContent()));
             }
         }
         tongyiMessages.add(createMessage(Role.USER, question.getContent()));

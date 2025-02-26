@@ -39,7 +39,7 @@ public class StandardTable {
 
     private String tableComment; // 表备注
 
-    private Integer columnRows; // 表数据量
+    private Long columnRows; // 表数据量
 
     private String granularityName; // 表的粒度
 

@@ -15,6 +15,7 @@
  */
 package com.web.vo;
 
+import com.web.constant.MessageMark;
 import lombok.Data;
 
 import java.util.Date;
@@ -23,6 +24,7 @@ import java.util.Date;
 public class MyMessage {
     private Integer messageId;
     private String sender;
+    private MessageMark messageMark;
     private String uuid;
     private String content;
     private Long createTime;

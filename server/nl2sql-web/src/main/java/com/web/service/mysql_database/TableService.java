@@ -29,4 +29,8 @@ public class TableService {
     public StandardTable getTableByOriginalTableName(String tableName) {
         return stTableMapper.getStandardTableByOriginalTableName(tableName);
     }
+
+    public StandardTable getTableByStandardTableId(Integer standardTableId) {
+        return stTableMapper.getTableByStandardTableId(standardTableId);
+    }
 }
