@@ -16,12 +16,11 @@
 package com.minimal_steiner_tree;
 
 import com.graph.Edge;
-import com.graph.MatrixEdge;
+import com.graph.DBGraphEdge;
 import com.graph.MatrixGraph;
 import com.graph.node.Node;
 import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
-
 import java.util.*;
 
 /** 通过最小斯坦纳树算法求出包含指定节点的最小斯坦纳树
@@ -34,6 +33,7 @@ public class MSTree {
     private int[][] nextNode; // 用于重建原有的图
 
     private MatrixGraph graph;
+    boolean initialized = false;
 
 
     public MSTree(){
@@ -82,21 +82,36 @@ public class MSTree {
                 }
             }
         }
+        initialized = true;
 
     }
 
 
     private boolean keyNodesInitial(Set<Node> keyNodes, int k, long[][] dp, int[][] parent) {
+        if(!initialized) {
+            return false;
+        }
+
         Iterator<Node> iter = null;
 
-        // 判断关键节点之间是否连通，不连通则直接结束初始化
-        for(int i = 0; i < k; i++) {
-            for(int j = i + 1; j < k; j++) {
-                if(dist[i][j] == Integer.MAX_VALUE) {
+        int[] nodeIndex = new int[keyNodes.size()];
+
+        // 判断关键节点之间是否互相连接，如果不互相连接则直接退出
+        int m = 0;
+        for (Node node : keyNodes) {
+            nodeIndex[m] = graph.node2index(node);
+            m += 1;
+        }
+
+        for(int i = 0; i < nodeIndex.length; i++) {
+            for(int j = i + 1; j < nodeIndex.length; j++) {
+                if(dist[nodeIndex[i]][nodeIndex[j]] == Integer.MAX_VALUE) {
                     return false;
                 }
             }
         }
+
+
 
         // 初始化dp和parent
         for (int v = 0; v < n; v++) {
@@ -127,14 +142,24 @@ public class MSTree {
         int k = keyNodes.size();
         Set<Edge> usedEdges = new HashSet<>();
 
-        if(k == 0) return null;
+        // 先创建一个无意义填充边，用于边界条件返回特殊值
+        Edge e = new DBGraphEdge();
+        TableNode t = new TableNode();
+        GranularityNode g = new GranularityNode();
+        e.setStart(t);
+        e.setEnd(g);
+
+        if(k == 0) {
+            usedEdges.add(e);
+            return usedEdges;
+        }
 
         if(k == 1){
-            int i = -1;
-            Edge e = new MatrixEdge();
             for(Node node : keyNodes){
-                e.setStart(node);
-                e.setEnd(node);
+                if(node instanceof TableNode){
+                    e.setStart(node);
+                    e.setEnd(((TableNode) node).getGranularity());
+                }
             }
             usedEdges.add(e);
             return usedEdges;
@@ -154,7 +179,10 @@ public class MSTree {
          */
         int[][] parent = new int[n][1 << k];
 
-        if(!keyNodesInitial(keyNodes, k, dp, parent)) return null;
+        if(!keyNodesInitial(keyNodes, k, dp, parent)) {
+            usedEdges.add(e);
+            return usedEdges;
+        }
 
         // Dreyfus-Wagner DP
         for (int S = 1; S <= fullMask; S++) {
@@ -251,7 +279,7 @@ public class MSTree {
     private Edge edge(int a, int b) {
         Node na = graph.index2node(a);
         Node nb = graph.index2node(b);
-        Edge edge = new MatrixEdge();
+        Edge edge = new DBGraphEdge();
         if(na.getClass().equals(TableNode.class) && nb.getClass().equals(GranularityNode.class)){
             edge.setStart(na);
             edge.setEnd(nb);

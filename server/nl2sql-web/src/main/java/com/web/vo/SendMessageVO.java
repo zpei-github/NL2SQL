@@ -22,6 +22,9 @@ import java.util.List;
 
 @Data
 public class SendMessageVO {
+    // 需要问的问题
     private MyMessage question;
+
+    // 已有的聊天记录
     private LinkedList<MyMessage> existMessages;
 }

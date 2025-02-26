@@ -2,23 +2,23 @@ package com.graph;
 
 
 import com.graph.node.Node;
+import com.graph.node.nodes.GranularityNode;
+import com.graph.node.nodes.TableNode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Objects;
 
-@Getter
-@Setter
-public class MatrixEdge implements Edge{
-    private Node start;
-    private Node end;
+public class DBGraphEdge implements Edge{
+    private TableNode start;
+    private GranularityNode end;
 
-    public MatrixEdge(Node start, Node end) {
-        this.start = start;
-        this.end = end;
+    public DBGraphEdge(Node start, Node end) {
+        if(start instanceof TableNode) {this.start = (TableNode)start;}
+        if(end instanceof GranularityNode) {this.end = (GranularityNode)end;}
     }
 
-    public MatrixEdge() {}
+    public DBGraphEdge() {}
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法
     @Override
@@ -26,7 +26,7 @@ public class MatrixEdge implements Edge{
         // 对象类型不匹配
         if (o == null || !this.getClass().equals(o.getClass()) ) return false;
 
-        MatrixEdge o1 = (MatrixEdge) o;
+        DBGraphEdge o1 = (DBGraphEdge) o;
         if (this.start == null){
             if(this.end == null){
                 return o1.getStart() == null && o1.getEnd() == null;
@@ -38,6 +38,22 @@ public class MatrixEdge implements Edge{
             return this.start.equals(o1.getStart()) && o1.getEnd() == null;
         }
         return this.start.equals(o1.getStart()) && this.end.equals(o1.getEnd());
+    }
+
+    public void setStart(Node start) {
+        if(start instanceof TableNode) {this.start = (TableNode)start;}
+    }
+
+    public void setEnd(Node end) {
+        if(end instanceof GranularityNode) {this.end = (GranularityNode) end;}
+    }
+
+    public Node getStart() {
+        return this.start;
+    }
+
+    public Node getEnd() {
+        return this.end;
     }
 
     @Override

@@ -51,15 +51,16 @@ export default {
             sender: "user",
             uuid: null,
             content: message,
+            messageMark:null,
             createTime: Date.now()};
           let response1 = await http.post("/chat/sendMessage", {
             question:my_question,
             existMessages:this.messages});
           if(response1.data){
-            this.messages.push(my_question);
-            this.messages.push(response1.data);
-            await db.addChat(my_question);
-            await db.addChat(response1.data);
+            for(let i = 0; i < response1.data.length; i++){
+              this.messages.push(response1.data[i])
+              await db.addChat(response1.data[i]);
+            }
           }
         } catch (error) {
           console.error("Failed to send message: ", error);
@@ -100,25 +101,28 @@ export default {
       }
     },
 
-    async getSQL() {
+    async getSQL(message) {
       try {
         const my_question = {
           messageId: this.messages.length + 1,
           sender: "user",
           uuid: null,
-          content: "现在需要你结合关键字和本地数据库得出SQL",
+          messageMark:null,
+          content: message,
           createTime: Date.now()};
 
         let response1 = await http.post("/chat/get_sql", {
           question:my_question,
           existMessages:this.messages});
 
+
+
         if(response1.data){
-          this.messages.push(my_question);
-          this.messages.push(response1.data);
-          await db.addChat(my_question);
-          await db.addChat(response1.data);
-        };
+          for(let i = 0; i < response1.data.length; i++){
+            this.messages.push(response1.data[i])
+            await db.addChat(response1.data[i]);
+          }
+        }
       } catch (error) {
         console.error("Error get sql:", error);
         this.$message.error("Error get sql:", error.message);
