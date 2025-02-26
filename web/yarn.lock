@@ -1320,6 +1320,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/trusted-types@^2.0.7":
+  "integrity" "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="
+  "resolved" "https://registry.npmmirror.com/@types/trusted-types/-/trusted-types-2.0.7.tgz"
+  "version" "2.0.7"
+
 "@types/ws@^8.5.5":
   "integrity" "sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A=="
   "resolved" "https://registry.npmmirror.com/@types/ws/-/ws-8.5.10.tgz"
@@ -2785,6 +2790,13 @@
   dependencies:
     "domelementtype" "^2.2.0"
 
+"dompurify@^3.2.4":
+  "integrity" "sha512-ysFSFEDVduQpyhzAob/kkuJjf5zWkZD8/A9ywSp1byueyuCfHamrCBa14/Oc2iiB0e51B+NpxSl5gmzn+Ms/mg=="
+  "resolved" "https://registry.npmmirror.com/dompurify/-/dompurify-3.2.4.tgz"
+  "version" "3.2.4"
+  optionalDependencies:
+    "@types/trusted-types" "^2.0.7"
+
 "domutils@^2.5.2", "domutils@^2.8.0":
   "integrity" "sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A=="
   "resolved" "https://registry.npmmirror.com/domutils/-/domutils-2.8.0.tgz"
@@ -3897,6 +3909,11 @@
   "version" "3.1.0"
   dependencies:
     "semver" "^6.0.0"
+
+"marked@^15.0.7":
+  "integrity" "sha512-dgLIeKGLx5FwziAnsk4ONoGwHwGPJzselimvlVskE9XLN4Orv9u2VA3GWw/lYUqjfA0rUT/6fqKwfZJapP9BEg=="
+  "resolved" "https://registry.npmmirror.com/marked/-/marked-15.0.7.tgz"
+  "version" "15.0.7"
 
 "mdn-data@2.0.14":
   "integrity" "sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow=="

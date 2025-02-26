@@ -17,6 +17,11 @@ package com.graph;
 
 
 import com.graph.node.Node;
+import com.graph.self_exceptions.IndexOutOfBoundsException;
+import com.graph.self_exceptions.NoIndexException;
+import com.graph.self_exceptions.IndexExistedException;
+import com.graph.self_exceptions.TwoNodeOperateException;
+
 import java.util.*;
 
 
@@ -33,6 +38,7 @@ public abstract class MatrixGraph implements Graph {
 
     // 邻接矩阵
     protected List<List<Integer>> graph;
+
 
     public MatrixGraph() {
         node2index = new HashMap<>();
@@ -52,9 +58,10 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/7
      **/
     @Override
-    public int allocateIndex(Node n) {
-        if (n == null) return -1;
-        if(node2index.containsKey(n)) return -2;
+    public int allocateIndex(Node n) throws NullPointerException{
+        if (n == null) throw new NullPointerException("when you allocate a index to a node, you are allocating a null node");
+
+        if(node2index.containsKey(n)) return node2index.get(n);
 
         int nodeIndex = -1;
 
@@ -103,7 +110,7 @@ public abstract class MatrixGraph implements Graph {
      **/
     @Override
     public Integer node2index(Node n) {
-        if (n == null) return -1;
+        if (n == null) return null;
         return node2index.get(n);
     }
 
@@ -132,8 +139,9 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/5
      **/
     @Override
-    public boolean link(Node n1, Node n2, Integer weight){
-        if(n1 == null || n2 == null || weight == null || n1.equals(n2)) return false;
+    public boolean link(Node n1, Node n2, Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
+        if(n1 == null || n2 == null || weight == null) throw new TwoNodeOperateException("when you link two nodes, there is a null node");
+        if(n1.equals(n2)) throw new TwoNodeOperateException("when you link two nodes, you are linking the same nodes");
 
         // 节点需要有索引，否则无法连接两个节点
         Integer n1index = node2index(n1);
@@ -152,15 +160,14 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/25
      **/
-    private boolean link(Integer n1index, Integer n2index, Integer weight){
-        if (n1index == null
-                || n2index == null
-                || n1index >= index2nodes.size()
-                || n2index >= index2nodes.size()
-                || index2nodes.get(n1index) == null
-                || index2nodes.get(n2index) == null
-                || weight == null
-                || isLinked(n1index, n2index)) return false;
+    private boolean link(Integer n1index, Integer n2index, Integer weight) throws IndexOutOfBoundsException, NoIndexException{
+
+        if(n1index >= index2nodes.size() || n2index >= index2nodes.size() || n1index < 0 || n2index < 0) throw new IndexOutOfBoundsException("when you link two indexes, one index is out of index bounds");
+
+        if(index2nodes.get(n1index) == null || index2nodes.get(n2index) == null) throw new NoIndexException("when you link two indexes, one node doesn't have index");
+
+        if(isLinked(n1index, n2index)) return false;
+
         int n1neighborCount = graph.get(n1index).size();
         int n2neighborCount = graph.get(n2index).size();
         int indexLength = index2nodes.size();
@@ -191,19 +198,19 @@ public abstract class MatrixGraph implements Graph {
      **/
     @Override
     public Integer getWeight(Node n1, Node n2) {
-        if(n1 == null || n2 == null) return -1;
+        if(n1 == null || n2 == null) return null;
 
         Integer n1index = node2index(n1);
         Integer n2index = node2index(n2);
 
         // 判断是否添加到索引
-        if (n1index == null || n2index == null ) return -2;
+        if (n1index == null || n2index == null ) return null;
         return getWeight(n1index, n2index);
     }
 
 
     /**
-     * 根据两节点的索引查询权重
+     * 查询索引间权重
      *
      * @param i1
      * @param i2
@@ -212,11 +219,7 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/7
      **/
     public Integer getWeight(int i1, int i2) {
-        if(i1 >= graph.size()
-                || i2 >= graph.get(i1).size()
-                || index2nodes.get(i1) == null
-                || index2nodes.get(i2) == null
-        ) return null;
+        if(i1 >= graph.size() || i2 >= graph.get(i1).size() || i1 < 0 || i2 < 0) return null;
         return graph.get(i1).get(i2);
     }
 
@@ -232,8 +235,8 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/5
      **/
     @Override
-    public boolean isLinked(Node n1, Node n2) {
-        if(n1 == null || n2 == null) return false;
+    public boolean isLinked(Node n1, Node n2) throws  NullPointerException{
+        if(n1 == null || n2 == null) throw new NullPointerException("when you get if two nodes is linked, there is a null node");
         Integer result = getWeight(n1, n2);
         return result != null && result >= 0;
     }
@@ -249,7 +252,7 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    public boolean isLinked(int i1, int i2) {
+    public boolean isLinked(int i1, int i2){
         return getWeight(i1, i2) != null;
     }
 
@@ -262,9 +265,10 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/11
      **/
     @Override
-    public boolean removeNode(Node n) {
-        if(n == null || !node2index.containsKey(n)) return false;
-        return removeNode(node2index(n));
+    public boolean removeNode(Node n) throws NoIndexException, IndexOutOfBoundsException {
+        if(n == null) return true;
+        if( !node2index.containsKey(n)) throw new NoIndexException("when you remove a null node, the node does not have an index");
+        return removeIndex(node2index(n));
     }
 
 
@@ -275,10 +279,10 @@ public abstract class MatrixGraph implements Graph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeNode(int i) {
-        if(i >= index2nodes.size()) return false;
+    public boolean removeIndex(int i) throws IndexOutOfBoundsException, NoIndexException {
+        if(i >= index2nodes.size() || i < 0) throw new IndexOutOfBoundsException("when you remove a index, the index is out of index bounds");
         Node n = index2nodes.get(i);
-        if(n == null) return false;
+        if(n == null) throw new NoIndexException("when you remove a index, the index does not belong to node2index");
 
         // 软删除，仅删除索引到节点和节点到索引的映射
         if(node2index.remove(n) != null){
@@ -315,7 +319,7 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/25
      **/
     public Integer getDegree(int nodeIndex) {
-        if(nodeIndex >= index2nodes.size() || index2nodes.get(nodeIndex) == null) return null;
+        if(nodeIndex >= index2nodes.size() || nodeIndex < 0 || index2nodes.get(nodeIndex) == null) return null;
 
         Integer degree = 0;
         for(int i = 0; i < graph.get(nodeIndex).size(); i++){
@@ -329,7 +333,7 @@ public abstract class MatrixGraph implements Graph {
      * 获取指定节点的邻居节点List
      *
      * @param n
-     * @return
+     * @return 邻居节点
      * @author zpei
      * @create 2024/12/5
      **/
@@ -356,7 +360,7 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/5
      **/
     public List<Integer> extractNeighborIndex(int n) {
-        if(n >= index2nodes.size() || index2nodes.get(n) == null) return null;
+        if(n >= index2nodes.size() || n < 0 || index2nodes.get(n) == null) return null;
 
         List<Integer> result = new ArrayList<>();
         for(int i = 0; i < graph.get(n).size(); i++){
@@ -378,15 +382,17 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/5
      **/
     @Override
-    public boolean updateWeight(Node n1, Node n2, Integer weight){
-        if(n1 == null
-                || n2 == null
-                || weight == null
-                || n1.equals(n2)
-        ) return false;
+    public boolean updateWeight(Node n1, Node n2, Integer weight) throws TwoNodeOperateException, NoIndexException {
+        if(n1 == null || n2 == null) throw new NullPointerException("when you update the weight between two nodes, there is a null node");
+
+        if(weight == null ) throw new NullPointerException("when you update the weight between two nodes, the weight is null");
+
+        if(n1.equals(n2)) throw new TwoNodeOperateException("when you update the weight between two nodes, you are updated two same nodes weight");
+
         Integer node1Index = node2index(n1);
         Integer node2Index = node2index(n2);
-        if(node1Index == null || node2Index == null) return false;
+
+        if(node1Index == null || node2Index == null) throw new NoIndexException("when you update the weight between two nodes, a node does not have index");
         return updateWeight(node1Index, node2Index, weight);
     }
 
@@ -427,7 +433,7 @@ public abstract class MatrixGraph implements Graph {
      * @create 2024/12/9
      **/
     @Override
-    public abstract boolean compute();
+    public abstract boolean compute() throws Exception;
 
 
     public void printGraph(){
@@ -456,9 +462,15 @@ public abstract class MatrixGraph implements Graph {
 
 
     public void printNodeIndex(){
-        for(int i = 0; i < index2nodes.size(); i++){
-            System.out.println( index2node(i) + "(" + i +")");
+        try{
+            for(int i = 0; i < index2nodes.size(); i++){
+                System.out.println( index2node(i) + "(" + i +")");
+            }
+            System.out.println();
+        } catch (Exception e){
+
+            e.printStackTrace();
         }
-        System.out.println();
+
     }
 }

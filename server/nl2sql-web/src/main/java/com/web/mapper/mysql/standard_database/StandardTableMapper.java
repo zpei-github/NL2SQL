@@ -22,4 +22,5 @@ import java.util.List;
 public interface StandardTableMapper {
     List<StandardTable> getAllStandardTables();
     StandardTable getStandardTableByOriginalTableName(String name);
+    StandardTable getTableByStandardTableId(Integer standardTableId);
 }

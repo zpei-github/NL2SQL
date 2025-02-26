@@ -35,7 +35,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    public int allocateIndex(Node n);
+    public int allocateIndex(Node n) throws Exception;
 
 
     /** 连接两个节点并赋权值
@@ -48,7 +48,7 @@ public interface Graph {
      * @author xinggang
      * @create 2024/12/5
      **/
-    public boolean link(Node n1, Node n2, Integer weight);
+    public boolean link(Node n1, Node n2, Integer weight) throws Exception;
 
 
     /** 由节点获取其索引值
@@ -80,7 +80,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean updateWeight(Node n1, Node n2, Integer weight);
+    public boolean updateWeight(Node n1, Node n2, Integer weight) throws Exception;
 
 
     /** 获取图中节点总数
@@ -133,7 +133,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeNode(Node n);
+    public boolean removeNode(Node n) throws Exception;
 
 
     /** 获取节点的度
@@ -152,5 +152,5 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/9
      **/
-    public boolean compute();
+    public boolean compute() throws Exception;
 }
