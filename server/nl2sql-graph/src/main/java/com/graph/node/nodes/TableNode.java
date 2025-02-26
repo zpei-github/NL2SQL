@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /** 表节点
- * 表节点用于存储表的信息, 包含表名和粒度信息
+ * 表节点用于存储表的信息, 包含源表名和新表名和粒度信息
  *
  *
  *
@@ -36,6 +36,7 @@ public class TableNode extends AbstractNode {
     private String tableName;
     private String originalName;
     private Node granularity;
+    private Long rowCount;
 
     public TableNode() {
         this(null);

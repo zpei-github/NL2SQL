@@ -17,6 +17,9 @@ package com.web.service.graph;
 
 import com.graph.DBGraph;
 import com.graph.Edge;
+import com.graph.self_exceptions.IndexOutOfBoundsException;
+import com.graph.self_exceptions.NoIndexException;
+import com.graph.self_exceptions.TwoNodeOperateException;
 import com.minimal_steiner_tree.MSTree;
 import com.graph.node.Node;
 import com.graph.node.nodes.FieldNode;
@@ -24,22 +27,22 @@ import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
 import com.web.entity.mysql.standard_database.*;
 import com.web.mapper.mysql.standard_database.*;
+import com.web.my_exception.InitializeException;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /** 图生成
  *
  */
-
+@Service
 @Component
 public class GraphComponent {
 
@@ -81,13 +84,20 @@ public class GraphComponent {
 
 
         // 为了方便直接结束，但是应该使用异常处理
-        if(!addColumns()) return;
-        if(!addGranularity()) return;
-        if(!addTablesAndLinkGranTable()) return;
-        if(!linkColTables()) return;
+        if(!addColumns()) throw new InitializeException("导入standard_column库出现异常");
+        if(!addGranularity()) throw new InitializeException("导入standard_granularity库出现异常");
+        if(!addTablesAndLinkGranTable()) throw new InitializeException("导入standard_table库和连接granularity_table出现异常");
+        if(!linkColTables()) throw new InitializeException("连接column与table出现异常");
 
-        graph.compute();
+        try{
+            graph.compute();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new InitializeException("图初始化异常");
+        }
+
         treeSolver.initial(graph);
+
         logger.info("GraphService initialized...");
     }
 
@@ -130,7 +140,6 @@ public class GraphComponent {
             if(granCol == null)  continue;
             GranularityNode gran = graph.findGranularityNode(granCol.getGranularityName());
             if(gran == null)  {
-                logger.info(granCol.getGranularityName());
                 continue;
             }
             gran.addField(graph.findFieldNode(granCol.getStandardColumnName()));
@@ -148,10 +157,15 @@ public class GraphComponent {
             TableNode tableNode = new TableNode(table.getStandardTableName());
             tableNode.setOriginalName(table.getOriginalTableName());
             tableNode.setGranularity(graph.findGranularityNode(table.getGranularityName()));
+            tableNode.setRowCount(table.getColumnRows());
             graph.add(tableNode);
 
-            // 连接粒度和表
-            graph.link(tableNode, graph.findGranularityNode(table.getGranularityName()), DBGraph.FULL_GRANULARITY_TABLE_WEIGHT);
+            try{
+                // 连接粒度和表
+                graph.link(tableNode, graph.findGranularityNode(table.getGranularityName()), DBGraph.FULL_GRANULARITY_TABLE_WEIGHT);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -163,7 +177,12 @@ public class GraphComponent {
         if (colTables == null || colTables.isEmpty()) return false;
         for (StandardColumnTable colTable : colTables) {
             if(colTable == null)  continue;
-            graph.link(graph.findFieldNode(colTable.getStandardColumnName()), graph.findTableNode(colTable.getStandardTableName()), 0);
+            try{
+                graph.link(graph.findFieldNode(colTable.getStandardColumnName()), graph.findTableNode(colTable.getStandardTableName()), 0);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         return true;
     }
@@ -189,21 +208,69 @@ public class GraphComponent {
         return keyNodes;
     }
 
-    /** 解出最小斯坦纳树
+    // 倒排索引获取需要求解的表
+    private Set<Node> fieldInvertedTable(Set<Node> nodes){
+        Set<Node> invertedNodes = graph.fieldInvertToTable(nodes);
+        logger.info("倒排索引后的表集合: " + invertedNodes.toString());
+        return invertedNodes;
+    }
+
+    /** 根据表名和字段名解出最小斯坦纳树
      *
-     * @param keyNodes 关键节点
+     * @param  standardTables 标准表
+     * @param  standardColumns 标准字段
      * @return 最小斯坦树的边集合。边的起点是表节点，终点是粒度节点
      * @author zpei
      * @create 2025/1/8
      **/
-    public Set<Edge> getMSTree(Set<Node> keyNodes){
-        return treeSolver.solve(keyNodes);
-    }
+    public Map<List<String>, List<String>> getMSTree(List<StandardTable> standardTables, List<StandardColumn> standardColumns){
+        // key值是表列表，value是key值中表连接所需的共同的字段
+        Map<List<String>, List<String>> result = new HashMap<>();
+        Set<Node> keyNodes = new HashSet<>();
+
+        // 用于得出使用相同粒度的表
+        Map<GranularityNode, List<TableNode>> filter = new HashMap<>();
+
+        for(StandardTable table :standardTables){
+            logger.info("表: " + table.getStandardTableName());
+            this.addKeyNodes(keyNodes, "table", table.getStandardTableName());
+        }
+
+        for(StandardColumn column : standardColumns){
+            logger.info("字段: " + column.getStandardColumnName());
+            this.addKeyNodes(keyNodes, "column", column.getStandardColumnName());
+        }
 
 
-    // 倒排索引获取需要求解的表
-    public Set<Node> fieldInvertedTable(Set<Node> nodes){
-        return graph.fieldInvertedTable(nodes);
+        for(Edge edge : treeSolver.solve(this.fieldInvertedTable(keyNodes))){
+            logger.info(edge.toString());
+            TableNode table = (TableNode)edge.getStart();
+            GranularityNode gran = (GranularityNode)edge.getEnd();
+            if(table.getTableName() == null && gran.getGranularityName() == null){
+                continue;
+            }
+            if(!filter.containsKey(gran)){
+                filter.put(gran, new ArrayList<>());
+            }
+            filter.get(gran).add(table);
+        }
+
+        // 将图信息整理为Map<List<String>, List<String>>格式
+        for(Map.Entry<GranularityNode, List<TableNode>> entry : filter.entrySet()){
+            List<String> columns = new LinkedList<>();
+            List<String> tables = new LinkedList<>();
+
+            for(Node coulum : entry.getKey().getFields()){
+                FieldNode field = (FieldNode)coulum;
+                columns.add(field.getOriginalName());
+            }
+
+            for(TableNode table : entry.getValue()){
+                tables.add(table.getOriginalName());
+            }
+            result.put(columns, tables);
+        }
+        return result;
     }
 
 }
