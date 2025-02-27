@@ -19,6 +19,7 @@ import com.graph.node.nodes.FieldNode;
 import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
 import com.graph.self_exceptions.IndexOutOfBoundsException;
+import com.graph.self_exceptions.InitializeException;
 import com.graph.self_exceptions.NoIndexException;
 import com.graph.self_exceptions.TwoNodeOperateException;
 
@@ -187,6 +188,7 @@ public class DBGraph extends MatrixGraph {
         return fieldIndex.get(name);
     }
 
+
     /** 移除一个字段节点
      *
      * @param node
@@ -210,8 +212,8 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/5
      **/
     public boolean addTableNode(TableNode node){
-        if (node == null) return false;
-        if(node.getTableName() == null || tableIndex.containsKey(node.getTableName())) return false;
+        if (node == null || node.getTableName() == null) return false;
+        if(tableIndex.containsKey(node.getTableName())) return true;
 
         allocateIndex(node);
 
@@ -305,7 +307,9 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/9
      **/
     @Override
-    public boolean compute() throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException{
+    public boolean initialize() throws Exception {
+        super.initialize();
+
         Map<TableNode, Integer> tableCounts = new HashMap<>();
         for (Map.Entry<String, GranularityNode> grans : granularityIndex.entrySet()) {
             int fieldCount = grans.getValue().fieldCount();
