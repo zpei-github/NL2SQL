@@ -287,7 +287,7 @@ public class ChatController {
                     for (String column : entry.getKey()) {
                         content.append(column).append(",");
                     }
-                    content.append(";\n");
+                    content.append(";\n\n");
                 }
             }
 
@@ -300,11 +300,12 @@ public class ChatController {
 
             // 判断是否添加关键字映射
             if(isAddKeywordMap){
-                content.append("关键字映射如下:\n");
+                content.append("表关键字映射如下:\n");
                 for(int i = 0, j = 0; i < tables.size(); i++, j++) {
                     if(tableKeywords[j].equals("")) j ++;
                     content.append(tableKeywords[j]).append(":").append(tables.get(i).getOriginalTableName()).append(",");
                 }
+                content.append("\n\n字段关键字映射如下:\n");
                 for (int i = 0, j = 0; i < columns.size(); i++, j++){
                     if(columnKeywords[j].equals("")) j ++;
                     content.append(columnKeywords[j]).append(":").append(columns.get(i).getOriginalColumnName()).append(",");

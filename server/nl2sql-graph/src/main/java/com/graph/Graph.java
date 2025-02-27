@@ -17,7 +17,6 @@ package com.graph;
 
 
 import com.graph.node.Node;
-import com.graph.self_exceptions.InitializeException;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/7
      **/
-    public int allocateIndex(Node n) throws Exception;
+    public int allocateIndex(Node n);
 
 
     /** 连接两个节点并赋权值
@@ -50,7 +49,7 @@ public interface Graph {
      * @author xinggang
      * @create 2024/12/5
      **/
-    public boolean link(Node n1, Node n2, Integer weight) throws Exception;
+    public boolean link(Node n1, Node n2, Integer weight);
 
 
     /** 由节点获取其索引值
@@ -82,7 +81,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/5
      **/
-    public boolean updateWeight(Node n1, Node n2, Integer weight) throws Exception;
+    public boolean updateWeight(Node n1, Node n2, Integer weight);
 
 
     /** 获取图中节点总数
@@ -134,7 +133,7 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeNode(Node n) throws Exception;
+    public boolean removeNode(Node n);
 
 
     /** 获取节点的度
@@ -153,5 +152,5 @@ public interface Graph {
      * @author zpei
      * @create 2024/12/9
      **/
-    public boolean initialize() throws Exception;
+    public boolean initialize();
 }

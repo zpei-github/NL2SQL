@@ -24,19 +24,4 @@ public class StringTools {
         // 返回是否匹配成功
         return matcher.matches();
     }
-
-    public static void main(String[] args) {
-        // 测试用例
-        String test1 = "{table1,table2};{field1,field2}"; // 符合格式
-        String test2 = "{table1};{field1}";               // 符合格式
-        String test3 = "{table1,table2}{field1,field2}";  // 不符合格式（缺少分号）
-        String test4 = "{table1,table2;field1,field2}";  // 不符合格式（分号位置错误）
-        String test5 = "{};{}";                          // 不符合格式（至少需要一个关键字）
-
-        System.out.println(isValidFormat(test1)); // true
-        System.out.println(isValidFormat(test2)); // true
-        System.out.println(isValidFormat(test3)); // false
-        System.out.println(isValidFormat(test4)); // false
-        System.out.println(isValidFormat(test5)); // false
-    }
 }

@@ -1,7 +1,7 @@
 package com.graph.self_exceptions;
 
 
-public class IndexOutOfBoundsException extends Exception{
+public class IndexOutOfBoundsException extends RuntimeException{
     public IndexOutOfBoundsException(String s){
         super(s);
     }
