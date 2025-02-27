@@ -17,6 +17,8 @@ package com.graph;
 
 
 import com.graph.node.Node;
+import com.graph.self_exceptions.InitializeException;
+
 import java.util.List;
 
 
@@ -115,7 +117,6 @@ public interface Graph {
 
 
 
-
     /** 获取指定节点的邻居节点List
      *
      * @param n
@@ -146,11 +147,11 @@ public interface Graph {
     public Integer getDegree(Node n);
 
 
-    /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
+    /** 当图添加节点完毕之后的初始化工作
      *
      * @return
      * @author zpei
      * @create 2024/12/9
      **/
-    public boolean compute() throws Exception;
+    public boolean initialize() throws Exception;
 }

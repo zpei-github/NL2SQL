@@ -22,25 +22,46 @@ import com.graph.node.Node;
 import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.lang.Math.min;
 
 /** 通过最小斯坦纳树算法求出包含指定节点的最小斯坦纳树
  * @Author zpei
  * @Date 2024/12/5
  */
 public class MSTree {
-    private int n = -1;  // 图中节点总数
-    private long[][] dist; // 节点对之间的最短距离
-    private int[][] nextNode; // 用于重建原有的图
+    // 图中节点总数
+    private int n = -1;
 
+    // 相邻矩阵图
     private MatrixGraph graph;
+
+    // 节点对之间的最短距离
+    private long[][] dist;
+
+    // 记录最短路径之间的节点，用于重建最小生成树
+    private int[][] nextNode;
+
+    // 记录索引属于哪个连通分支, 连通分支编号从1号开始
+    private int[] index2part;
+
+    // 记录连通分支数量
+    int partCount;
+
+
+    // 是否被初始化
     boolean initialized = false;
+
+    private static final Logger logger = LoggerFactory.getLogger(MSTree.class);
 
 
     public MSTree(){
     }
 
     /** 初始化操作
-     * 当图发生变化就需要进行初始化。更新图和重算节点对之间的最短路径
+     * 当图发生变化就需要进行初始化。更新图和计算节点对之间的最短路径，
      * @param graph
      * @return
      * @author zpei
@@ -49,31 +70,58 @@ public class MSTree {
     public void initial(MatrixGraph graph) {
         this.graph = graph;
         this.n = graph.getNodeCount();
-        dist = new long[n][n];
-        nextNode = new int[n][n];
+        this.dist = new long[n][n];
+        this.nextNode = new int[n][n];
+
+        this.index2part = new int[n];
+        this.partCount = 0;
 
         for (int i = 0; i < n; i++) {
-
-            // 初始化节点对之间的距离为Integer.MAX_VALUE
-            Arrays.fill(dist[i], Integer.MAX_VALUE);
-            Arrays.fill(nextNode[i], -1);
-            dist[i][i] = 0;
-        }
-
-        for (int i = 0; i < n; i++) {
+            // 初始化索引到连通分支编号为-1
+            this.index2part[i] = -1;
             for (int j = 0; j < n; j++) {
-                if (graph.getWeight(i, j) != null) {
-                    dist[i][j] = graph.getWeight(i, j);
-                    nextNode[i][j] = -1; // directly connected
+                // 初始化设置节点之间没有最短路径，所以不存在最短路径间节点
+                this.nextNode[i][j] = -1;
+
+                // 初始化设置点间距离
+                if (graph.isLinked(i, j)) {
+                    // 直接连接的节点间距离为权重
+                    this.dist[i][j] = graph.getWeight(i, j);
+                }else {
+                    // 未直接连接的节点间距离为Integer.MAX_VALUE
+                    this.dist[i][j] = Integer.MAX_VALUE;
                 }
             }
         }
 
-        // Floyd-Warshall
+        // 连通分支计算
+        this.partCount = findConnectedComponents(graph, index2part, n);
+
+        // 节点间最短距离计算
+        floydWarshall(this.dist,this.nextNode,this.n);
+
+        this.initialized = true;
+    }
+
+
+
+    /**
+     * 初始化方法相关算法，用于节点对之间最短距离，用于后面最小生成树算法
+     * @param dist 节点对间最短距离
+     * @param nextNode 最短路径记录
+     * @param n 节点数量
+     * @return
+     * @author zpei
+     * @create 2025/2/27
+     **/
+    private void floydWarshall(long[][] dist, int[][] nextNode, int n) {
+        // Floyd-Warshall算法
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     if (dist[i][k] + dist[k][j] < dist[i][j]) {
+
+                        // 距离更新
                         dist[i][j] = dist[i][k] + dist[k][j];
 
                         // 如果最ij之间存在中间节点k使得ij路径减少，则nextNode记录下中间节点k
@@ -82,35 +130,56 @@ public class MSTree {
                 }
             }
         }
-        initialized = true;
-
     }
 
 
-    private boolean keyNodesInitial(Set<Node> keyNodes, int k, long[][] dp, int[][] parent) {
-        if(!initialized) {
+    /**
+     *  连通分量求解方法
+     * @param graph 图
+     * @param index2part 索引标记数组
+     * @param n 图中节点数量
+     * @return 连通分量的数量
+     * @author zpei
+     * @create 2025/2/27
+     **/
+    private int findConnectedComponents(MatrixGraph graph, int[] index2part, int n) {
+        int partNum = 0;
+        for (int i = 0; i < n; i++) {
+            if (index2part[i] == -1) {
+                partNum ++;
+                this.dfsOfComponent(i, graph, index2part, partNum);
+            }
+        }
+        return partNum;
+    }
+
+    // dfs求解连通分量
+    private void dfsOfComponent(int node, MatrixGraph graph, int[] visited, int partNum){
+        if(visited[node] != -1)return;
+        visited[node] = partNum;
+        for(Integer neighbor : graph.extractNeighborIndex(node)){
+            dfsOfComponent(neighbor, graph, visited, partNum);
+        }
+    }
+
+
+
+    /** solve方法相关方法
+     * dp数组和parent数组的初始化
+     * @param keyNodes 关键节点集合
+     * @param dp 最小斯坦纳树的dp数组
+     * @param parent 路径记录数组
+     * @return 是否初始化成功
+     * @author zpei
+     * @create 2025/2/26
+     **/
+    private boolean keyNodesInitial(Set<Node> keyNodes, long[][] dp, int[][] parent) {
+        if(!initialized || keyNodes == null || keyNodes.isEmpty()) {
             return false;
         }
 
+        int k = keyNodes.size();
         Iterator<Node> iter = null;
-
-        int[] nodeIndex = new int[keyNodes.size()];
-
-        // 判断关键节点之间是否互相连接，如果不互相连接则直接退出
-        int m = 0;
-        for (Node node : keyNodes) {
-            nodeIndex[m] = graph.node2index(node);
-            m += 1;
-        }
-
-        for(int i = 0; i < nodeIndex.length; i++) {
-            for(int j = i + 1; j < nodeIndex.length; j++) {
-                if(dist[nodeIndex[i]][nodeIndex[j]] == Integer.MAX_VALUE) {
-                    return false;
-                }
-            }
-        }
-
 
 
         // 初始化dp和parent
@@ -133,14 +202,22 @@ public class MSTree {
 
     /**
      *
-     * @param keyNodes 关键节点
-     * @return 返回最小斯坦纳树的边集合。其中边的格式为表节点在前，粒度节点在后
+     * @return
      * @author zpei
-     * @create 2025/1/8
+     * @create 2025/2/26
      **/
-    public Set<Edge> solve(Set<Node> keyNodes){
+
+
+    /** keyNodesInitial相关方法
+     * 检查关键节点，处理关键节点的边界值
+     * @param keyNodes 关键节点集合
+     * @param usedEdges 输出边集合
+     * @return 是否节点集合数量大于 1
+     * @author zpei
+     * @create 2025/2/27
+     **/
+    private boolean keyNodesCheck(Set<Node> keyNodes, Set<Edge> usedEdges){
         int k = keyNodes.size();
-        Set<Edge> usedEdges = new HashSet<>();
 
         // 先创建一个无意义填充边，用于边界条件返回特殊值
         Edge e = new DBGraphEdge();
@@ -150,20 +227,36 @@ public class MSTree {
         e.setEnd(g);
 
         if(k == 0) {
+            // 没有关键节点输入
             usedEdges.add(e);
-            return usedEdges;
+            return false;
         }
-
-        if(k == 1){
-            for(Node node : keyNodes){
-                if(node instanceof TableNode){
+        if (k == 1) {
+            // 关键节点数量为1
+            for (Node node : keyNodes) {
+                if (node instanceof TableNode) {
                     e.setStart(node);
                     e.setEnd(((TableNode) node).getGranularity());
                 }
             }
             usedEdges.add(e);
-            return usedEdges;
+            return false;
         }
+        return true;
+    }
+
+
+    /**
+     * 解出最小斯坦纳树
+     * @param keyNodes 关键节点
+     * @return 返回最小斯坦纳树的边集合。其中边的格式为表节点在前，粒度节点在后
+     * @author zpei
+     * @create 2025/1/8
+     **/
+    public Set<Edge> solve(Set<Node> keyNodes){
+        int k = keyNodes.size();
+        Set<Edge> usedEdges = new HashSet<>();
+
 
         // 状态码，通过二进制左移关键节点个数获取，可以通过一个状态码判断包含那些关键节点
         int fullMask = (1 << k) - 1;
@@ -179,8 +272,7 @@ public class MSTree {
          */
         int[][] parent = new int[n][1 << k];
 
-        if(!keyNodesInitial(keyNodes, k, dp, parent)) {
-            usedEdges.add(e);
+        if(!keyNodesInitial(keyNodes, dp, parent)) {
             return usedEdges;
         }
 
@@ -238,6 +330,16 @@ public class MSTree {
         return usedEdges;
     }
 
+    /**
+     * 图的边集合解
+     * @param v 最小斯坦纳树权重
+     * @param S 关键节点掩码值
+     * @param usedEdges 最小斯坦纳树边集合
+     * @param parent 路径记录数组
+     * @return
+     * @author zpei
+     * @create 2025/2/26
+     **/
     private void rebuildSolution(int v, int S, Set<Edge> usedEdges, int[][] parent) {
         int p = parent[v][S];
         if (p == -1) {
