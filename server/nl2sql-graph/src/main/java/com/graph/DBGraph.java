@@ -307,7 +307,7 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/9
      **/
     @Override
-    public boolean initialize() throws Exception {
+    public boolean initialize() {
         super.initialize();
 
         Map<TableNode, Integer> tableCounts = new HashMap<>();

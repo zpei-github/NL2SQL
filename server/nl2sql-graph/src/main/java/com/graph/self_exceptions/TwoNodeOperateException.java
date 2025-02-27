@@ -1,7 +1,7 @@
 package com.graph.self_exceptions;
 
 
-public class TwoNodeOperateException extends Exception{
+public class TwoNodeOperateException extends RuntimeException{
 
     public TwoNodeOperateException() {
         super();

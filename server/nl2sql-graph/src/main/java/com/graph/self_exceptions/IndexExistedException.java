@@ -1,7 +1,7 @@
 package com.graph.self_exceptions;
 
 
-public class IndexExistedException extends Exception{
+public class IndexExistedException extends RuntimeException{
     public IndexExistedException(){
         super();
     }

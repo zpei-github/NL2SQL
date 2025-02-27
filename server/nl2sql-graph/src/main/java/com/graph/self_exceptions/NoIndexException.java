@@ -1,7 +1,7 @@
 package com.graph.self_exceptions;
 
 
-public class NoIndexException extends Exception{
+public class NoIndexException extends RuntimeException{
     public NoIndexException(){
         super();
     }
