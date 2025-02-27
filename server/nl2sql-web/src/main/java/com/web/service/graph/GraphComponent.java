@@ -90,7 +90,7 @@ public class GraphComponent {
         if(!linkColTables()) throw new InitializeException("连接column与table出现异常");
 
         try{
-            graph.compute();
+            graph.initialize();
         }catch (Exception e){
             e.printStackTrace();
             throw new InitializeException("图初始化异常");
@@ -113,7 +113,7 @@ public class GraphComponent {
     // 添加字段节点
     private boolean addColumns() {
         List<StandardColumn> columns = columnMapper.getAllStandardColumn();
-        if (columns == null || columns.isEmpty()) { return false; }
+        if (columns == null || columns.isEmpty())  return false;
         for (StandardColumn column : columns) {
             if(column == null)  continue;
             FieldNode fieldNode = new FieldNode(column.getStandardColumnName());

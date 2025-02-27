@@ -19,7 +19,6 @@ package com.graph;
 import com.graph.node.Node;
 import com.graph.self_exceptions.IndexOutOfBoundsException;
 import com.graph.self_exceptions.NoIndexException;
-import com.graph.self_exceptions.IndexExistedException;
 import com.graph.self_exceptions.TwoNodeOperateException;
 
 import java.util.*;
@@ -27,24 +26,30 @@ import java.util.*;
 
 // 可动态扩展的邻接矩阵图
 public abstract class MatrixGraph implements Graph {
-    // 节点位置信息map，节点总数等于map的size
+    // 节点索引信息map，节点总数等于map的size
     protected final Map<Node, Integer> node2index;
 
-    // 位置节点List
+    // 索引-节点List
     protected final List<Node> index2nodes;
 
-    // 空置的索引
+    // 空置的位置
     private final LinkedList<Integer> vacantIndexes;
 
     // 邻接矩阵
-    protected List<List<Integer>> graph;
+    protected final List<List<Integer>> graph;
+
+    // 初始化
+    public boolean initialized;
 
 
     public MatrixGraph() {
         node2index = new HashMap<>();
+
+        // 当index2nodes[i]为null时，代表索引值i未被分配给某个节点
         index2nodes = new ArrayList<>();
         vacantIndexes = new LinkedList<>();
         graph = new ArrayList<>();
+        initialized = false;
     }
 
 
@@ -95,7 +100,7 @@ public abstract class MatrixGraph implements Graph {
 
         // 创建n的索引
         node2index.put(n, nodeIndex);
-
+        initialized = false;
         return nodeIndex;
     }
 
@@ -140,7 +145,7 @@ public abstract class MatrixGraph implements Graph {
      **/
     @Override
     public boolean link(Node n1, Node n2, Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
-        if(n1 == null || n2 == null || weight == null) throw new TwoNodeOperateException("when you link two nodes, there is a null node");
+        if(n1 == null || n2 == null || weight == null) throw new NullPointerException("when you link two nodes, there is a null node");
         if(n1.equals(n2)) throw new TwoNodeOperateException("when you link two nodes, you are linking the same nodes");
 
         // 节点需要有索引，否则无法连接两个节点
@@ -183,6 +188,7 @@ public abstract class MatrixGraph implements Graph {
         // 无向图双向连接
         graph.get(n1index).set(n2index, weight);
         graph.get(n2index).set(n1index, weight);
+        initialized = false;
         return true;
     }
 
@@ -274,20 +280,22 @@ public abstract class MatrixGraph implements Graph {
 
     /** 根据节点索引值移除该节点
      *
-     * @param i
+     * @param index
      * @return 返回是否移除成功
      * @author zpei
      * @create 2024/12/11
      **/
-    public boolean removeIndex(int i) throws IndexOutOfBoundsException, NoIndexException {
-        if(i >= index2nodes.size() || i < 0) throw new IndexOutOfBoundsException("when you remove a index, the index is out of index bounds");
-        Node n = index2nodes.get(i);
+    public boolean removeIndex(int index) throws IndexOutOfBoundsException, NoIndexException {
+        if(index >= index2nodes.size() || index < 0) throw new IndexOutOfBoundsException("when you remove a index, the index is out of index bounds");
+        Node n = index2nodes.get(index);
         if(n == null) throw new NoIndexException("when you remove a index, the index does not belong to node2index");
 
         // 软删除，仅删除索引到节点和节点到索引的映射
         if(node2index.remove(n) != null){
-            index2nodes.set(i, null);
-            vacantIndexes.add(i);
+            // 索引信息处理
+            index2nodes.set(index, null);
+            vacantIndexes.add(index);
+            initialized = false;
             return true;
         }
         return false;
@@ -411,6 +419,8 @@ public abstract class MatrixGraph implements Graph {
         // 无向图需要双向修改
         graph.get(n1).set(n2, weight);
         graph.get(n2).set(n1, weight);
+
+        initialized = false;
         return true;
     }
 
@@ -426,14 +436,16 @@ public abstract class MatrixGraph implements Graph {
     }
 
 
-    /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用
+    /** 当图添加节点完毕之后需要计算之后生成关键数据才能使用,或者图修改之后未初始化
      *
      * @return
      * @author zpei
      * @create 2024/12/9
      **/
     @Override
-    public abstract boolean compute() throws Exception;
+    public boolean initialize() throws Exception{
+        return true;
+    }
 
 
     public void printGraph(){
