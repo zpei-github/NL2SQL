@@ -4,6 +4,7 @@ E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\FieldN
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\TableNode.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\Node.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\Edge.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\InitializeException.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\TwoNodeOperateException.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\IndexExistedException.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\DBGraphEdge.java

@@ -210,9 +210,7 @@ public class GraphComponent {
 
     // 倒排索引获取需要求解的表
     private Set<Node> fieldInvertedTable(Set<Node> nodes){
-        Set<Node> invertedNodes = graph.fieldInvertToTable(nodes);
-        logger.info("倒排索引后的表集合: " + invertedNodes.toString());
-        return invertedNodes;
+        return graph.fieldInvertToTable(nodes);
     }
 
     /** 根据表名和字段名解出最小斯坦纳树
@@ -232,18 +230,15 @@ public class GraphComponent {
         Map<GranularityNode, List<TableNode>> filter = new HashMap<>();
 
         for(StandardTable table :standardTables){
-            logger.info("表: " + table.getStandardTableName());
             this.addKeyNodes(keyNodes, "table", table.getStandardTableName());
         }
 
         for(StandardColumn column : standardColumns){
-            logger.info("字段: " + column.getStandardColumnName());
             this.addKeyNodes(keyNodes, "column", column.getStandardColumnName());
         }
 
 
         for(Edge edge : treeSolver.solve(this.fieldInvertedTable(keyNodes))){
-            logger.info(edge.toString());
             TableNode table = (TableNode)edge.getStart();
             GranularityNode gran = (GranularityNode)edge.getEnd();
             if(table.getTableName() == null && gran.getGranularityName() == null){

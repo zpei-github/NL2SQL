@@ -301,7 +301,7 @@ public abstract class MatrixGraph implements Graph {
     }
 
     /**
-     *
+     * 获取指定节点的度数
      * @param n
      * @return
      * @author zpei
@@ -318,8 +318,8 @@ public abstract class MatrixGraph implements Graph {
     }
 
 
-    /** 获取某个索引值节点的度
-     *
+    /**
+     * 获取某个索引值节点的度
      * @param nodeIndex
      * @return 度
      * @author zpei
