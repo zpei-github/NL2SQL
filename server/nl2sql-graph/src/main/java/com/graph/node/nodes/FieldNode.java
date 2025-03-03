@@ -42,10 +42,8 @@ public class FieldNode extends AbstractNode {
         if (o == null || !this.getClass().equals(o.getClass()) ) return false;
 
         FieldNode o1 = (FieldNode) o;
-        if (this.fieldName == null){
-            return o1.getFieldName() == null;
-        }
-        return this.fieldName.equals(o1.getFieldName());
+
+        return (this.fieldName != null && this.fieldName.equals(o1.getFieldName())) ||  o1.getFieldName() == null;
     }
 
     @Override

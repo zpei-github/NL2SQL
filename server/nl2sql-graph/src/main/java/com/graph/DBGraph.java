@@ -26,6 +26,13 @@ import com.graph.self_exceptions.TwoNodeOperateException;
 import java.util.*;
 
 
+/**
+ * 依据关系型数据库结构构建的数据库图，将表、字段和粒度等概念进行抽象后构建无向带权图，同时实现相关功能。
+ * 继承MatrixGraph创建DBGraph
+ * @Author zpei
+ * @date 2025/3/3
+ */
+
 public class DBGraph extends MatrixGraph {
     // 字段与所属表之间的权值定为1L
     public final static Integer FIELD_TABLE_WEIGHT = 1;
@@ -43,7 +50,7 @@ public class DBGraph extends MatrixGraph {
     private final Map<String, TableNode> tableIndex;
 
     /** 字段-表map
-     * key 为字段，List为存在该字段的表的集合
+     * key 为字段，List为存在该字段的表
      */
     private final Map<Node, List<Node>> field_tables;
 
@@ -374,7 +381,6 @@ public class DBGraph extends MatrixGraph {
         for(Node node : nodes){
             if(node instanceof TableNode || node instanceof GranularityNode){
                 keyNodes.add(node);
-
             }
         }
 
@@ -414,8 +420,8 @@ public class DBGraph extends MatrixGraph {
                 if(!record.containsKey(table)){
                     record.put(table, new ArrayList<>());
                 }
-                record.get(table).add(node);
 
+                record.get(table).add(node);
 
                 if(!score.containsKey(table)){
                     score.put(table, 0d);

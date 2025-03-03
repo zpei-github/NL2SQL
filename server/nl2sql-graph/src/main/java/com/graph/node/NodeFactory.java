@@ -21,7 +21,7 @@ import com.graph.node.nodes.TableNode;
 
 public class NodeFactory {
     public NodeFactory() {}
-    public Node createNode(String label) {
+    public static Node createNode(String label) {
         if("table".equals(label)) {
             return new TableNode();
         }
@@ -34,7 +34,7 @@ public class NodeFactory {
         return null;
     }
 
-    public Node createNode(String label, String name) {
+    public static Node createNode(String label, String name) {
         if("table".equals(label)) {
             return new TableNode(name);
         }
