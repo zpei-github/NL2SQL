@@ -90,8 +90,9 @@ public class ElasticsearchService {
                     .query(q -> q
                             .match(m -> m
                                     .field("table_comment")
+                                    .minimumShouldMatch("60%") // 最小匹配度
                                     .query(tableComment) // 搜索的内容
-                                    .analyzer("ik_max_word") // 使用 IK 分词器
+                                    .analyzer("ik_smart") // 使用 IK 分词器
                             )
                     )
             );
@@ -119,8 +120,9 @@ public class ElasticsearchService {
                     .query(q -> q
                             .match(m -> m
                                     .field("column_comment")
+                                    .minimumShouldMatch("60%") // 最小匹配度
                                     .query(columnComment) // 搜索的内容
-                                    .analyzer("ik_max_word") // 使用 IK 分词器
+                                    .analyzer("ik_smart") // 使用 IK 分词器
                             )
                     )
             );

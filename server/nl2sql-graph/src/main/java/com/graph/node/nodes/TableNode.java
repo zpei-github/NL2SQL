@@ -54,10 +54,7 @@ public class TableNode extends AbstractNode {
 
         TableNode o1 = (TableNode) o;
 
-        if(this.tableName == null) {
-            return o1.getTableName() == null;
-        }
-        return this.tableName.equals(o1.getTableName());
+        return (this.tableName != null && this.tableName.equals(o1.getTableName())) || o1.getTableName() == null;
     }
 
     @Override
