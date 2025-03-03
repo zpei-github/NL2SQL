@@ -78,11 +78,7 @@ public class GranularityNode extends AbstractNode {
 
         GranularityNode o1 = (GranularityNode) o;
 
-        if(this.GranularityName == null){
-            return o1.GranularityName == null;
-        }
-
-        return this.GranularityName.equals(o1.getGranularityName());
+        return (this.GranularityName != null && this.GranularityName.equals(o1.getGranularityName())) || o1.getGranularityName() == null;
     }
 
     @Override

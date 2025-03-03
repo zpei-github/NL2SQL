@@ -19,6 +19,8 @@ import com.web.constant.MessageMark;
 import com.web.constant.ProjectConstant;
 import com.web.constant.ReturnCode;
 import com.web.data.ResultData;
+import com.web.entity.elasticsearch.StandardColumnIndex;
+import com.web.entity.elasticsearch.StandardTableIndex;
 import com.web.entity.mysql.standard_database.StandardColumn;
 import com.web.entity.mysql.standard_database.StandardTable;
 import com.web.service.LLMService;
@@ -115,7 +117,6 @@ public class ChatController {
             }
         }
 
-        logger.info(history.toString());
         keywords = llmService.response(question, history, "qwen-max");
 
 
@@ -224,8 +225,6 @@ public class ChatController {
             }
         }
 
-        logger.info(history.toString());
-
         returnData.add(question);
         response = llmService.response(localQuestion, history, "qwen-max");
         response.setMessageMark(MessageMark.MM10005);
@@ -258,13 +257,24 @@ public class ChatController {
         String[] tableKeywords = keyword[0].substring(1, keyword[0].length() - 1).split(",");
         String[] columnKeywords = keyword[1].substring(1, keyword[1].length() - 1).split(",");
 
+        logger.info(keywords.toString());
+
         for (String table : tableKeywords) {
             if (table.equals("")) continue;
-            tables.add(tableService.getTableByStandardTableId(esService.searchByTableComment("standard_table_index", table).get(0).getStandard_table_id()));
+            List<StandardTableIndex> stTable = esService.searchByTableComment("standard_table_index", table);
+            if(stTable == null || stTable.isEmpty()){
+                continue;
+            }
+            tables.add(tableService.getTableByStandardTableId(stTable.get(0).getStandard_table_id()));
         }
         for (String column : columnKeywords) {
             if (column.equals("")) continue;
-            columns.add(columnService.getStandardColumnByStandardColumnId(esService.searchByColumnComment("standard_column_index", column).get(0).getStandard_column_id()));
+            List<StandardColumnIndex> stColumn = esService.searchByColumnComment("standard_column_index", column);
+
+            if(stColumn == null || stColumn.isEmpty()){
+                continue;
+            }
+            columns.add(columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id()));
         }
 
         Map<List<String>, List<String>> tree = gComponent.getMSTree(tables, columns);
