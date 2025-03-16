@@ -28,9 +28,16 @@ import java.util.*;
 
 // RobinsZelikovsky算法求解ST 暂时无法使用
 public class RobinsZelikovsky implements SteinerTreeSolver {
+    // 图
     private final MatrixGraph graph;
+
+    // 由Floyd-Warshall算法得到的节点对间最短距离，dist[i][j]表示节点i到节点j的最短距离
     private final long[][] dist;
+
+    // 由Floyd-Warshall算法得到的中间节点数组，后续用于回溯最短路径
     private final int[][] nextNode;
+    
+    // 图中节点总数
     private final int n;
 
     public RobinsZelikovsky(MatrixGraph graph, long[][] dist, int[][] nextNode, int n) {
@@ -42,10 +49,15 @@ public class RobinsZelikovsky implements SteinerTreeSolver {
 
 
     public void solver(Set<Node> keyNodes, Set<Edge> usedEdges) {
+        if(keyNodes == null || usedEdges == null) throw new IllegalArgumentException("keyNodes and usedEdges must not be null");
         Set<Integer> terminals = new HashSet<>();
         for(Node node : keyNodes) {
-            terminals.add(graph.node2index(node));
+            Integer index = graph.node2index(node);
+            if(index == null) continue;
+            terminals.add(index);
         }
+
+        if(terminals.isEmpty()) return;
 
         // 步骤1: 预处理
         Map<Integer, Map<Integer, Long>> metric = new HashMap<>();
@@ -84,7 +96,10 @@ public class RobinsZelikovsky implements SteinerTreeSolver {
                             long costI = getMinDistance(compI, v, metric);
                             long costJ = getMinDistance(compJ, v, metric);
                             long currentCost = getMinDistance(compI, compJ, metric);
-                            long gain = costI + costJ - currentCost;
+                            
+                            // 修正增益计算：当前成本减去使用Steiner点的成本
+                            if(costI == Long.MAX_VALUE || costJ == Long.MAX_VALUE || currentCost == Long.MAX_VALUE) continue;
+                            long gain = currentCost - (costI + costJ);
 
                             if (gain > maxGain) {
                                 maxGain = gain;
@@ -97,17 +112,45 @@ public class RobinsZelikovsky implements SteinerTreeSolver {
                 }
             }
 
-            if (bestI != -1) {
+            if (bestI != -1 && maxGain > 0) {
                 // 合并组件并添加Steiner点
                 Set<Integer> merged = new HashSet<>(components.get(bestI));
                 merged.addAll(components.get(bestJ));
                 merged.add(bestSteiner);
                 components.remove(bestJ);
                 components.set(bestI, merged);
+            } else {
+                // 如果没有找到有效的Steiner点或增益为负，直接合并两个最近的组件
+                long minCost = Long.MAX_VALUE;
+                bestI = -1;
+                bestJ = -1;
+                
+                for (int i = 0; i < components.size(); i++) {
+                    for (int j = i + 1; j < components.size(); j++) {
+                        long cost = getMinDistance(components.get(i), components.get(j), metric);
+                        if (cost < minCost) {
+                            minCost = cost;
+                            bestI = i;
+                            bestJ = j;
+                        }
+                    }
+                }
+                
+                if (bestI != -1) {
+                    Set<Integer> merged = new HashSet<>(components.get(bestI));
+                    merged.addAll(components.get(bestJ));
+                    components.remove(bestJ);
+                    components.set(bestI, merged);
+                } else {
+                    // 如果无法合并，退出循环
+                    break;
+                }
             }
         }
 
-        buildSteinerEdges(components.get(0), usedEdges);
+        if (!components.isEmpty()) {
+            buildSteinerEdges(components.get(0), usedEdges);
+        }
     }
 
 
@@ -140,7 +183,14 @@ public class RobinsZelikovsky implements SteinerTreeSolver {
                     int current = u;
                     while (current != v) {
                         int next = nextNode[current][v];
-                        usedEdges.add(edge(current, next));
+                        if (next == -1) {
+                            // 如果没有找到下一个节点，说明路径不完整
+                            break;
+                        }
+                        Edge e = edge(current, next);
+                        if (e != null) {
+                            usedEdges.add(e);
+                        }
                         current = next;
                     }
                 }

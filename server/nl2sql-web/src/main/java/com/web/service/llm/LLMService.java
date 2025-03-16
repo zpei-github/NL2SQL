@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.web.service;
+package com.web.service.llm;
 
 
 import com.alibaba.dashscope.aigc.generation.Generation;

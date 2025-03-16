@@ -18,8 +18,6 @@ package com.web.vo;
 import com.web.constant.MessageMark;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class MyMessage {
     private Integer messageId;
@@ -28,4 +26,19 @@ public class MyMessage {
     private String uuid;
     private String content;
     private Long createTime;
+
+    public MyMessage() {}
+
+    public MyMessage(Integer messageId, String sender, MessageMark messageMark, String content) {
+        this(messageId, sender, messageMark, null, content, System.currentTimeMillis());
+    }
+
+    public MyMessage(Integer messageId, String sender, MessageMark messageMark, String uuid, String content, Long createTime) {
+        this.messageId = messageId;
+        this.sender = sender;
+        this.messageMark = messageMark;
+        this.uuid = uuid;
+        this.content = content;
+        this.createTime = createTime;
+    }
 }

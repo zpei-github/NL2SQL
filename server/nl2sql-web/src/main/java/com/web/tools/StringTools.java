@@ -6,22 +6,17 @@ public class StringTools {
 
     /**
      * 判断输入字符串是否符合指定格式
+     *
      * @param input 输入的字符串
      * @return 是否符合格式（true/false）
      * @author zpei
      * @create 2025/2/25
      **/
     public static boolean isValidFormat(String input) {
-        // 正则表达式匹配格式：{表名关键字1,表名关键字2...};{字段名关键字1,字段名关键字2...}
-        String regex = "^\\{([^,{}]+(,[^,{}]+)*)\\};\\{([^,{}]+(,[^,{}]+)*)\\}$";
-
-        // 编译正则表达式
+        // 更新后的正则表达式，确保字段名之间只能使用逗号分隔
+        String regex = "\\{(?!:$)([^:]*):([^,}]+(?:,[^,}]+)*)?\\}(?:;\\{(?!:$)([^:]*):([^,}]+(?:,[^,}]+)*)?\\})*";
         Pattern pattern = Pattern.compile(regex);
-
-        // 匹配输入字符串
         Matcher matcher = pattern.matcher(input);
-
-        // 返回是否匹配成功
-        return matcher.matches();
+        return matcher.matches() && !input.contains("{:}") && !input.contains("{::}");
     }
 }

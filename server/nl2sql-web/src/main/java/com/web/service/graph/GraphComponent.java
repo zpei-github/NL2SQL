@@ -17,9 +17,6 @@ package com.web.service.graph;
 
 import com.graph.DBGraph;
 import com.graph.Edge;
-import com.graph.self_exceptions.IndexOutOfBoundsException;
-import com.graph.self_exceptions.NoIndexException;
-import com.graph.self_exceptions.TwoNodeOperateException;
 import com.minimal_steiner_tree.MSTree;
 import com.graph.node.Node;
 import com.graph.node.nodes.FieldNode;
@@ -170,7 +167,7 @@ public class GraphComponent {
         return true;
     }
 
-
+    // 连接字段和表
     private boolean linkColTables() {
         List<StandardColumnTable> colTables = colTableMapper.getAllStandardColumnTable();
 
@@ -267,5 +264,4 @@ public class GraphComponent {
         }
         return result;
     }
-
 }
