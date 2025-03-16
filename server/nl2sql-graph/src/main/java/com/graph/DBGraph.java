@@ -19,7 +19,6 @@ import com.graph.node.nodes.FieldNode;
 import com.graph.node.nodes.GranularityNode;
 import com.graph.node.nodes.TableNode;
 import com.graph.self_exceptions.IndexOutOfBoundsException;
-import com.graph.self_exceptions.InitializeException;
 import com.graph.self_exceptions.NoIndexException;
 import com.graph.self_exceptions.TwoNodeOperateException;
 
@@ -141,8 +140,15 @@ public class DBGraph extends MatrixGraph {
         if(!field_tables.containsKey(field) || !node2index.containsKey(table)
         ) return false;
 
-        // 添加映射
-        field_tables.get(field).add(table);
+        GranularityNode g = (GranularityNode) table.getGranularity();
+
+        if(g.getFields().contains(field)){
+            // 添加映射
+            field_tables.get(field).add(0, table);
+        }else {
+            field_tables.get(field).add(table);
+        }
+
         return true;
     }
 
@@ -178,7 +184,7 @@ public class DBGraph extends MatrixGraph {
         fieldIndex.put(node.getFieldName(), node);
 
         // 给字段新建一个映射List
-        field_tables.put(node, new ArrayList<>());
+        field_tables.put(node, new LinkedList<>());
         return true;
     }
 
@@ -317,7 +323,9 @@ public class DBGraph extends MatrixGraph {
     public boolean initialize() {
         super.initialize();
 
-        Map<TableNode, Integer> tableCounts = new HashMap<>();
+        // 表-粒度字段信息映射：value[0]判断表字段与粒度字段的交集个数, value[1]判断粒度字段属于表的联合主键字段的个数
+        Map<TableNode, int[]> tableCounts = new HashMap<>();
+
         for (Map.Entry<String, GranularityNode> grans : granularityIndex.entrySet()) {
             int fieldCount = grans.getValue().fieldCount();
             GranularityNode gran = grans.getValue();
@@ -327,27 +335,30 @@ public class DBGraph extends MatrixGraph {
                 List<Node> tables = field_tables.get(field);
                 for(Node node : tables){
                     TableNode table = (TableNode) node;
+                    GranularityNode t_gran = (GranularityNode) table.getGranularity();
 
                     // 如果表的粒度和该粒度恰好是一样的，则进行满连接
                     if(table.getGranularity().equals(gran)){
-
-                        // throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException
                         link_table_granularity(table, gran, FULL_GRANULARITY_TABLE_WEIGHT);
-
                         continue;
                     }
 
                     if(tableCounts.containsKey(table)){
-                        tableCounts.replace(table, tableCounts.get(table) + 1);
+                        tableCounts.get(table)[0] ++;
                     }else
-                        tableCounts.put(table, 1);
+                        tableCounts.put(table, new int[]{1,0});
+
+                    if(t_gran.getFields().contains(field)){
+                        tableCounts.get(table)[1] += 2;
+                    }
                 }
             }
 
-            // 将粒度节点与包含有相关字段的表进行连接
-            for(Map.Entry<TableNode, Integer> tables : tableCounts.entrySet()){
-                if(tables.getValue().equals(fieldCount) ){
-                    link_table_granularity(tables.getKey(), gran, INITIAL_GRANULARITY_TABLE_WEIGHT + (2 << (6 - fieldCount)));
+            // 将粒度节点与包含有粒度字段的表进行连接
+            for(Map.Entry<TableNode, int[]> tables : tableCounts.entrySet()){
+                int[] counts = tables.getValue();
+                if(counts[0] == fieldCount ){
+                    link_table_granularity(tables.getKey(), gran, FULL_GRANULARITY_TABLE_WEIGHT + (int)(30*(1/(1-Math.exp((fieldCount + counts[1]))/2))));
                 }
             }
             tableCounts.clear();
@@ -357,7 +368,7 @@ public class DBGraph extends MatrixGraph {
 
 
     /** 倒排索引确认需要求解的表
-     * 在建立好的图中，求解最小斯坦纳树应该主要关注表节点和粒度节点，字段可以通过倒排索引聚集到数量较少的几张表中
+     * 在建立好的图中，求解最小斯坦纳树应该主要关注表节点和粒度节点，没有关联关系的字段都需要通过倒排索引聚集到数量较少的几张表中
      * 多个字段节点可能指向同一张表，因此通过倒排索引递归得出包含字段最多的单张表，从而大大降低斯坦树求解的关键节点数量
      * @param nodes
      * @return 求解的表set
@@ -394,11 +405,15 @@ public class DBGraph extends MatrixGraph {
 
     /** 递归倒排索引打分获取目标表节点
      * 倒排索引打分可以自定义
-     *
-     * @param
-     * @return
+     * @param keyNodes 输出的关键节点
+     * @param field_tables 字段-表映射
+     * @param nodes 输入的源节点
+     * @param fieldIndex 字段名索引
+     * @param record 暂存记录
+     * @param score 分数暂存记录
+     * @return 关键节点集合
      * @author zpei
-     * @create 2024/12/12
+     * @create 2025/3/9
      **/
     private Set<Node> invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex, HashMap<Node, List<Node>> record, HashMap<Node, Double> score){
         if(nodes.isEmpty()) return keyNodes;
@@ -426,6 +441,7 @@ public class DBGraph extends MatrixGraph {
                 if(!score.containsKey(table)){
                     score.put(table, 0d);
                 }
+                //数量提升的基础分10分
                 double s = 10d;
 
                 TableNode t1 = (TableNode) table;
@@ -437,7 +453,6 @@ public class DBGraph extends MatrixGraph {
 
                 // 倒排索引打分策略2: 数据量评价
                 s += Math.log10(t1.getRowCount()) / 10;
-
 
                 score.put(table, score.get(table) + s);
 

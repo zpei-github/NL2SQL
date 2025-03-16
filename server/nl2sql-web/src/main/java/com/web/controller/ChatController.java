@@ -17,15 +17,15 @@ package com.web.controller;
 
 import com.web.constant.MessageMark;
 import com.web.constant.ProjectConstant;
-import com.web.constant.ReturnCode;
 import com.web.data.ResultData;
 import com.web.entity.elasticsearch.StandardColumnIndex;
 import com.web.entity.elasticsearch.StandardTableIndex;
 import com.web.entity.mysql.standard_database.StandardColumn;
 import com.web.entity.mysql.standard_database.StandardTable;
-import com.web.service.LLMService;
+import com.web.service.llm.LLMService;
 import com.web.service.elasticsearch.ElasticsearchService;
 import com.web.service.graph.GraphComponent;
+import com.web.service.llm.OllamaEmbeddingService;
 import com.web.service.mysql_database.ColumnService;
 import com.web.service.mysql_database.TableService;
 import com.web.tools.StringTools;
@@ -47,6 +47,9 @@ public class ChatController {
 
     @Autowired
     private LLMService llmService;
+
+    @Autowired
+    private OllamaEmbeddingService embeddingService;
 
     @Autowired
     private TableService tableService;
@@ -75,7 +78,6 @@ public class ChatController {
         // 返回消息
         MyMessage answer = new MyMessage();
 
-        MyMessage prompt = new MyMessage();
 
         // 返回的聊天记录
         List<MyMessage> returnData = new ArrayList<>();
@@ -83,31 +85,36 @@ public class ChatController {
         // prompt具体内容
         StringBuilder promptContent = new StringBuilder();
 
-        // 表关键字列表
-        List<StandardTable> tables = new ArrayList<>();
-
-        // 字段关键字列表
-        List<StandardColumn> columns = new ArrayList<>();
-
-        // 树搜索
-        Set<String> tableSet = new HashSet<>();
-
 
         // prompt内容
         promptContent.append(
-                "你是一个数据分析助手，我会向你提出SQL查询需求、修改和纠错要求。对于我提出的SQL查询需求，你需要找出查询需求的表名关键字和字段名关键字并按照指定格式输出，只能从需求中获取表名和字段名关键字，不可以添加额外的内容。对于修改和纠错要求，你需要按照我的要求修改之后严格按照格式要求重新输出结果。具体的输出格式如下:\n" +
-                        "{表名关键字1,表名关键字2...};{字段名关键字1,字段名关键字2...}\n\n" +
-                        "示例1:\n SQL查询需求: 需要计算出厂年份为2024年的商品价格平均值\n" +
-                        "结果: {};{出厂年份,商品价格}\n\n" +
-                        "示例2:\n SQL查询需求: 以学生表中的学生为准，得出年龄在10至15岁之间的学生的身高平均值\n" +
-                        "结果: {学生};{年龄,学生身高}\n");
+                "你是一个数据分析助手，我会向你提出SQL查询需求、修改和纠错要求。对于我提出的SQL查询需求，你需要找出查询需求的表名关键字和字段名关键字并按照指定格式输出，只能从需求中获取表名和字段名关键字，不可以额外添加思维链或者存在\"输出结果:{t1:f1}\"等这样的内容。对于修改和纠错要求，你需要按照我的要求修改之后严格按照格式要求重新输出结果。\n" +
+                "格式说明如下：\n" +
+                "1.每个\"{}\"代表一个关联关系，关联关系之间以英文半角\";\"分割；\n" +
+                "2.如果字段和表存在明确关联关系，则该字段和表存在同一个关联关系，表和字段以英文半角\":\"分割；\n" +
+                "3.每个\"{}\"中只能存在一个表名关键字，而字段关键字可以有多个，且必须以英文半角逗号\",\"进行分割；\n" +
+                "4.如果没有表和字段存在明确关联关系，则字段将单独占用一个\"{}\"，且表名关键字为空；\n" +
+                "5.如果没有字段和表存在明确关联关系，表也可以单独占用一个\"{}\"，且字段名关键字为空；\n" +
+                "6.不能存在字段名关键字和表名关键字都为空的情况。\n" +
+                "\n" +
+                "具体的输出格式如下:\n" +
+                "{表名关键字1:字段名关键字1,字段名关键字2...};{表名关键字2:字段名关键字3,字段名关键字4...};...\n" +
+                "\n" +
+                "示例1:SQL查询需求:需要计算出厂年份为2024年的商品价格平均值 \n" +
+                "思维链:需求中没有指向明确的表，所以没有表名关键字；需求明确了需要出厂年份为2024，以及需要商品价格平均值，所以字段关键名中存在出厂年份和商品价格。两个关键名没有明确是属于同一张表，所以分别存储在两个关联关系中。\n" +
+                "输出结果: {:出厂年份};{:商品价格}\n" +
+                "\n" +
+                "示例2:SQL查询需求:从学生表中得出年龄在10至15岁之间的学生的身高平均值\n" +
+                "思维链:需求中明确了指向学生表，因此有一个表名关键字学生；并且需求还说明需要学生表中的年龄在10至15岁，因此学生表关联的字段名关键字有年龄；同时还指明学生身高也在学生表中，因此和学生表关联的字段还有学生身高。\n" +
+                "输出结果: {学生:年龄,学生身高}\n" +
+                "\n" +
+                "示例3:SQL查询需求:以学生表中的学生ID为基准，查询学生的寝室号以及座位号\n" +
+                "思维链:需求中明确了学生ID是学生表的字段，因此有一个关联关系是学生表和学生ID；需求中还存在关键字寝室号和座位号，但是没有明确寝室号和座位号与哪张表有关联关系，因此这两个关键字分别占一个\"{}\"。\n" +
+                "输出结果: {学生:学生ID};{:寝室号};{:座位号}\n");
 
         //设置prompt
-        prompt.setMessageId(0);
-        prompt.setSender(ProjectConstant.SYSTEM_SENDER);
-        prompt.setCreateTime(System.currentTimeMillis());
-        prompt.setContent(promptContent.toString());
-        prompt.setMessageMark(MessageMark.MM10002);
+        MyMessage prompt = new MyMessage(0,ProjectConstant.SYSTEM_SENDER, MessageMark.MM10002, promptContent.toString());
+
 
         history.add(0, prompt);
         for(int i = history.size() - 1; i >= 0; i--){
@@ -118,22 +125,21 @@ public class ChatController {
         }
 
         keywords = llmService.response(question, history, "qwen-max");
+        keywords.setMessageId(question.getMessageId() + 1);
+        keywords.setMessageMark(MessageMark.MM10003);
 
+        returnData.add(question);
 
         history.add(question);
         history.add(keywords);
 
         // 格式重复解析
         int retryTimes = 0;
+        MyMessage correct = new MyMessage(question.getMessageId(), ProjectConstant.USER_SENDER, null, "输出结果格式不符合要求，重新输出");
         while (!StringTools.isValidFormat(keywords.getContent())) {
-            MyMessage correct = new MyMessage();
-            correct.setMessageId(question.getMessageId());
-            correct.setCreateTime(System.currentTimeMillis());
-            correct.setSender(ProjectConstant.USER_SENDER);
-            correct.setContent("输出结果格式不符合要求，重新输出");
-
             keywords = llmService.response(correct, history, "qwen-max");
-
+            correct.setMessageId(keywords.getMessageId() - 1);
+            correct.setCreateTime(System.currentTimeMillis());
 
             history.add(correct);
             history.add(keywords);
@@ -146,24 +152,20 @@ public class ChatController {
                 correct.setSender(ProjectConstant.CLIENT_SENDER);
                 correct.setContent("服务出现异常，请检查查询需求后重试");
 
-
-                returnData.add(question);
                 returnData.add(correct);
                 return ResultData.success(returnData);
             }
         }
 
-
-        returnData.add(question);
-        keywords.setMessageId(question.getMessageId() + 1);
-        keywords.setMessageMark(MessageMark.MM10003);
         returnData.add(keywords);
 
         // 组成输出结果
         answer.setCreateTime(System.currentTimeMillis());
         answer.setSender(ProjectConstant.CLIENT_SENDER);
         answer.setMessageId(keywords.getMessageId() + 1);
+
         answer.setContent(getDatabaseInfo(keywords.getContent(), true, true, true));
+
         if(answer.getContent().equals("当前本地数据库的数据无法满足您的SQL查询需求，请检查您的需求之后重试")){
             answer.setMessageMark(MessageMark.MM10000);
         }else {
@@ -189,9 +191,6 @@ public class ChatController {
         // 返回值
         List<MyMessage> returnData = new ArrayList<>();
 
-        //
-        MyMessage localQuestion = new MyMessage();
-
         // 大模型返回结果
         MyMessage response = null;
 
@@ -201,19 +200,10 @@ public class ChatController {
         promptContent.append("你是一名专业数据分析师。后续我会提出数据库查询需求及相关修改意见，同时本地服务给出的表结构信息，表之间的连接信息等，最后需要根据需求生成准确的SQL查询语句");
 
         // prompt
-        MyMessage prompt = new MyMessage();
-        prompt.setMessageId(0);
-        prompt.setSender(ProjectConstant.SYSTEM_SENDER);
-        prompt.setCreateTime(System.currentTimeMillis());
-        prompt.setContent(promptContent.toString());
-        prompt.setMessageMark(MessageMark.MM10004);
+        MyMessage prompt = new MyMessage(0,ProjectConstant.SYSTEM_SENDER,MessageMark.MM10004,promptContent.toString());
 
-
-        localQuestion.setMessageId(question.getMessageId());
-        localQuestion.setMessageMark(MessageMark.MM10004);
-        localQuestion.setCreateTime(System.currentTimeMillis());
-        localQuestion.setContent(question.getContent() + "\n现在需要根据我的需求和上下文给出SQL查询语句");
-        localQuestion.setSender(ProjectConstant.USER_SENDER);
+        // 缺省消息
+        MyMessage localQuestion = new MyMessage(question.getMessageId(), ProjectConstant.USER_SENDER, MessageMark.MM10004, question.getContent() + "\n现在需要根据我的需求和上下文给出SQL查询语句");
 
 
         boolean mark = false;
@@ -247,38 +237,67 @@ public class ChatController {
     public String getDatabaseInfo(String keywords, boolean isAddDDL, boolean isAddTableConnectInfo,boolean isAddKeywordMap) {
         StringBuilder content = new StringBuilder();
 
+        // 表关键字
         List<StandardTable> tables = new ArrayList<>();
+
+        // 用于聚合的字段关键字
         List<StandardColumn> columns = new ArrayList<>();
 
-        Set<String> tableSet = new HashSet<>();
+        // 表关键字与源表名映射记录
+        List<String> tableNameMap = new ArrayList<>();
 
-        // 关键字提取
-        String[] keyword = keywords.split(";");
-        String[] tableKeywords = keyword[0].substring(1, keyword[0].length() - 1).split(",");
-        String[] columnKeywords = keyword[1].substring(1, keyword[1].length() - 1).split(",");
+        // 字段关键字与源字段名映射记录
+        List<String> columnNameMap = new ArrayList<>();
 
-        logger.info(keywords.toString());
+        // 关联关系提取
+        String[] relations = keywords.split(";");
+        for(String relation : relations){
+            String[] keyword = relation.substring(1, relation.length() - 1).split(":");
+            String tableKeyword = keyword[0].trim();
+            String[] columnKeyword = keyword[1].split(",");
 
-        for (String table : tableKeywords) {
-            if (table.equals("")) continue;
-            List<StandardTableIndex> stTable = esService.searchByTableComment("standard_table_index", table);
-            if(stTable == null || stTable.isEmpty()){
+            logger.info(relation);
+
+            // 关键字引擎匹配到的表列表
+            List<StandardTableIndex> stTable = null;
+
+            // 关键字引擎匹配到的字段列表
+            List<StandardColumnIndex> stColumn = null;
+
+            if (!tableKeyword.equals("")
+                    // 开始匹配表关键字
+                    && (stTable = esService.searchByTableComment("standard_table_index", tableKeyword)) != null
+                    && !stTable.isEmpty()) {
+                StandardTable stt = tableService.getTableByStandardTableId(stTable.get(0).getStandard_table_id());
+                tables.add(stt);
+                tableNameMap.add(tableKeyword + ":" + stt.getOriginalTableName());
+
+                for(String column : columnKeyword){
+                    if (!column.equals("")
+                            // 开始匹配字段关键字
+                            && (stColumn = esService.searchByColumnComment("standard_column_index", column)) != null
+                            && !stColumn.isEmpty()){
+                        StandardColumn stc = columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id());
+                        columnNameMap.add(column + ":" + stc.getOriginalColumnName());
+                    }
+                }
                 continue;
             }
-            tables.add(tableService.getTableByStandardTableId(stTable.get(0).getStandard_table_id()));
-        }
-        for (String column : columnKeywords) {
-            if (column.equals("")) continue;
-            List<StandardColumnIndex> stColumn = esService.searchByColumnComment("standard_column_index", column);
 
-            if(stColumn == null || stColumn.isEmpty()){
-                continue;
+            for(String column : columnKeyword){
+                if (!column.equals("")
+                        && (stColumn = esService.searchByColumnComment("standard_column_index", column)) != null
+                        && !stColumn.isEmpty()){
+                    StandardColumn stc = columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id());
+                    columns.add(stc);
+                    columnNameMap.add(column + ":" + stc.getOriginalColumnName());
+                }
             }
-            columns.add(columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id()));
         }
 
         Map<List<String>, List<String>> tree = gComponent.getMSTree(tables, columns);
 
+        Set<String> tableSet = new HashSet<>();
         if (tree.isEmpty()) {
             content.append("当前本地数据库的数据无法满足您的SQL查询需求，请检查您的需求之后重试");
         } else {
@@ -310,19 +329,16 @@ public class ChatController {
 
             // 判断是否添加关键字映射
             if(isAddKeywordMap){
-                content.append("表关键字映射如下:\n");
-                for(int i = 0, j = 0; i < tables.size(); i++, j++) {
-                    if(tableKeywords[j].equals("")) j ++;
-                    content.append(tableKeywords[j]).append(":").append(tables.get(i).getOriginalTableName()).append(",");
+                content.append("\n\n表关键字映射如下:\n");
+                for(String tMap: tableNameMap){
+                    content.append(tMap).append(",\n");
                 }
                 content.append("\n\n字段关键字映射如下:\n");
-                for (int i = 0, j = 0; i < columns.size(); i++, j++){
-                    if(columnKeywords[j].equals("")) j ++;
-                    content.append(columnKeywords[j]).append(":").append(columns.get(i).getOriginalColumnName()).append(",");
+                for(String tMap: columnNameMap){
+                    content.append(tMap).append(",\n");
                 }
             }
         }
-
         return content.toString();
     }
 }
