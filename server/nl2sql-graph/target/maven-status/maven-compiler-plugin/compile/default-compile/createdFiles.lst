@@ -1,12 +1,17 @@
 com\graph\MatrixGraph.class
 com\minimal_steiner_tree\MSTree.class
 com\graph\Edge.class
+com\minimal_steiner_tree\mst_solve_alogrithms\DreyfusWagner.class
 com\graph\DBGraph.class
+com\minimal_steiner_tree\initialize\MinimumDistance.class
 com\graph\node\Node.class
+com\minimal_steiner_tree\mst_solve_alogrithms\SteinerTreeSolver.class
+com\minimal_steiner_tree\mst_solve_alogrithms\RobinsZelikovsky.class
 com\graph\node\nodes\AbstractNode.class
 com\graph\self_exceptions\IndexExistedException.class
 com\graph\self_exceptions\IndexOutOfBoundsException.class
 com\graph\self_exceptions\TwoNodeOperateException.class
+com\minimal_steiner_tree\initialize\ConnectedComponent.class
 com\graph\node\NodeFactory.class
 com\graph\DBGraphEdge.class
 com\graph\self_exceptions\InitializeException.class

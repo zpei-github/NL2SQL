@@ -1,6 +1,9 @@
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\MSTree.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\NodeFactory.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\FieldNode.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\initialize\MinimumDistance.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\initialize\ConnectedComponent.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\mst_solve_alogrithms\DreyfusWagner.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\TableNode.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\Node.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\Edge.java
@@ -9,9 +12,11 @@ E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\T
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\IndexExistedException.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\DBGraphEdge.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\MatrixGraph.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\mst_solve_alogrithms\RobinsZelikovsky.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\DBGraph.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\NoIndexException.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\AbstractNode.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\node\nodes\GranularityNode.java
+E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\minimal_steiner_tree\mst_solve_alogrithms\SteinerTreeSolver.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\Graph.java
 E:\Git\Java\NL2SQL\server\nl2sql-graph\src\main\java\com\graph\self_exceptions\IndexOutOfBoundsException.java
