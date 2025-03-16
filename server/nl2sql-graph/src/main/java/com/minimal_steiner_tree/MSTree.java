@@ -185,7 +185,7 @@ public class MSTree {
             // 对每个连通分支中的节点进行分别求解
             for(Map.Entry<Integer, Set<Node>> entry : partMark.entrySet()){
                 // 没有通过检测的keyNodes会被忽略
-                if(!keyNodesCheck(keyNodes, usedEdges))continue;
+                if(!keyNodesCheck(keyNodes, usedEdges)) continue;
 
                 mst_solver.solver( entry.getValue(), usedEdges);
             }
