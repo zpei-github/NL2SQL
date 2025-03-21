@@ -8,13 +8,6 @@ logging:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
-elasticsearch:
-  host: ${docker_elasticsearch_ip}
-  port: 9200
-  username: ${docker_elasticsearch_user}
-  password: ${docker_elasticsearch_password}
-
-
 milvus:
   token: ${docker_milvus_token}
   url: ${docker_milvus_url}
