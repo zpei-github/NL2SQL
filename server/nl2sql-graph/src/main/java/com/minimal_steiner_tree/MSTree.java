@@ -163,7 +163,7 @@ public class MSTree {
         int k = keyNodes.size();
         Map<Integer, Set<Node>> partMark = new HashMap<>();
 
-        // 区分每个连通分支中的节点
+        // 分配关键节点至连通分支
         for(Node node : keyNodes){
             Integer index = graph.node2index(node);
             if(index == null) continue;
