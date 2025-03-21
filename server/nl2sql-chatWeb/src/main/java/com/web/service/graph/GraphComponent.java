@@ -89,7 +89,7 @@ public class GraphComponent {
         try{
             graph.initialize();
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
             throw new InitializeException("图初始化异常");
         }
 
@@ -161,7 +161,7 @@ public class GraphComponent {
                 // 连接粒度和表
                 graph.link(tableNode, graph.findGranularityNode(table.getGranularityName()), DBGraph.FULL_GRANULARITY_TABLE_WEIGHT);
             } catch (Exception e){
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
         return true;
@@ -177,7 +177,7 @@ public class GraphComponent {
             try{
                 graph.link(graph.findFieldNode(colTable.getStandardColumnName()), graph.findTableNode(colTable.getStandardTableName()), 0);
             } catch (Exception e){
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
 
         }

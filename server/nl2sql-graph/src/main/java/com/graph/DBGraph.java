@@ -349,7 +349,7 @@ public class DBGraph extends MatrixGraph {
                         tableCounts.put(table, new int[]{1,0});
 
                     if(t_gran.getFields().contains(field)){
-                        tableCounts.get(table)[1] += 2;
+                        tableCounts.get(table)[1] += 1;
                     }
                 }
             }
@@ -358,7 +358,7 @@ public class DBGraph extends MatrixGraph {
             for(Map.Entry<TableNode, int[]> tables : tableCounts.entrySet()){
                 int[] counts = tables.getValue();
                 if(counts[0] == fieldCount ){
-                    link_table_granularity(tables.getKey(), gran, FULL_GRANULARITY_TABLE_WEIGHT + (int)(30*(1/(1-Math.exp((fieldCount + counts[1]))/2))));
+                    link_table_granularity(tables.getKey(), gran,  (int)(FULL_GRANULARITY_TABLE_WEIGHT + 1 + Math.exp(9 - fieldCount -counts[1])));
                 }
             }
             tableCounts.clear();
