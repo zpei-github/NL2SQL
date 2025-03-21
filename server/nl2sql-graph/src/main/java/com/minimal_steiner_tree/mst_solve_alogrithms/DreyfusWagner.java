@@ -82,7 +82,7 @@ public class DreyfusWagner implements SteinerTreeSolver {
 
     /** dreyfus_wagner()方法相关方法
      * 图的边集合解
-     * @param v 最小斯坦纳树权重
+     * @param v 最优的结束节点
      * @param S 关键节点掩码值
      * @param usedEdges 最小斯坦纳树边集合
      * @param parent 路径记录数组
@@ -225,8 +225,6 @@ public class DreyfusWagner implements SteinerTreeSolver {
             }
         }
         // 计算完毕
-
-
         // Find the best endpoint
         long ans = Integer.MAX_VALUE;
         int bestV = -1;
