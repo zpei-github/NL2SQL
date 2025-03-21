@@ -26,7 +26,7 @@
 	<modules>
 		<module>nl2sql-graph</module>
 		<module>nl2sql-llm</module>
-		<module>nl2sql-web</module>
+		<module>nl2sql-chatWeb</module>
 	</modules>
 
 
@@ -47,7 +47,7 @@
 
 			<dependency>
 				<groupId>com.nl2sql</groupId>
-				<artifactId>nl2sql-web</artifactId>
+				<artifactId>nl2sql-chatWeb</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
