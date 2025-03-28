@@ -31,14 +31,14 @@ public class StandardColumnTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer standardColumnTableId; // 主键id
+    private Integer standard_column_table_id; // 主键id
 
-    private String standardTableName; // 标准表名
+    private String standard_table_name; // 标准表名
 
-    private String standardColumnName; // 标准字段名
+    private String standard_column_name; // 标准字段名
 
-    private Integer standardColumnId; // 标准字段id
+    private Integer standard_column_id; // 标准字段id
 
-    private Integer standardTableId; // 标准规范表id
+    private Integer standard_table_id; // 标准规范表id
 }
 

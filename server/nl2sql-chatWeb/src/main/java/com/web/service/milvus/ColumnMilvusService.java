@@ -67,7 +67,7 @@ public class ColumnMilvusService{
 
     @PreDestroy
     private void destroy(){
-        // 服务销毁之后会释放milvus上的collection
+        // 服务关闭之后会释放milvus上的collection
         client.releaseCollection(ReleaseCollectionReq.builder()
                 .collectionName(collectionName)
                 .build());
