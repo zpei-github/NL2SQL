@@ -245,11 +245,11 @@ public class ChatController {
         // 用于聚合的字段关键字
         List<StandardColumn> columns = new ArrayList<>();
 
-        // 表关键字与源表名映射记录
-        List<String> tableNameMap = new ArrayList<>();
+        // 表关键字与源表名映射记录[关键字, 源表名]
+        List<String[]> tableNameMap = new ArrayList<>();
 
-        // 字段关键字与源字段名映射记录
-        List<String> columnNameMap = new ArrayList<>();
+        // 字段关键字与源字段名映射记录[关键字, 源字段名]
+        List<String[]> columnNameMap = new ArrayList<>();
 
         // 关联关系提取
         String[] relations = keywords.split(";");
@@ -257,8 +257,6 @@ public class ChatController {
             String[] keyword = relation.substring(1, relation.length() - 1).split(":");
             String tableKeyword = keyword[0].trim();
             String[] columnKeyword = keyword[1].split(",");
-
-            logger.info(relation);
 
             // 关键字引擎匹配到的表列表
             List<StandardTableSchema> stTable = null;
@@ -272,7 +270,7 @@ public class ChatController {
                     && !stTable.isEmpty()) {
                 StandardTable stt = tableService.getTableByStandardTableId(stTable.get(0).getStandard_table_id());
                 tables.add(stt);
-                tableNameMap.add(tableKeyword + ":" + stt.getOriginalTableName());
+                tableNameMap.add(new String[]{tableKeyword,stt.getOriginal_table_name()});
 
                 for(String column : columnKeyword){
                     if (!column.equals("")
@@ -280,7 +278,7 @@ public class ChatController {
                             && (stColumn = cMilService.hybridSearch(column, 3)) != null
                             && !stColumn.isEmpty()){
                         StandardColumn stc = columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id());
-                        columnNameMap.add(column + ":" + stc.getOriginalColumnName());
+                        columnNameMap.add(new String[]{column,stc.getOriginal_column_name()});
                     }
                 }
                 continue;
@@ -292,7 +290,7 @@ public class ChatController {
                         && !stColumn.isEmpty()){
                     StandardColumn stc = columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id());
                     columns.add(stc);
-                    columnNameMap.add(column + ":" + stc.getOriginalColumnName());
+                    columnNameMap.add(new String[]{column,stc.getOriginal_column_name()});
                 }
             }
         }
@@ -325,19 +323,19 @@ public class ChatController {
             if(isAddDDL){
                 content.append("\n各表的表结构如下:\n");
                 for (String table : tableSet) {
-                    content.append(tableService.getTableByOriginalTableName(table).getOriginalTableDDL()).append("\n\n");
+                    content.append(tableService.getTableByOriginalTableName(table).getOriginal_table_ddl()).append("\n\n");
                 }
             }
 
             // 判断是否添加关键字映射
             if(isAddKeywordMap){
                 content.append("\n\n表关键字映射如下:\n");
-                for(String tMap: tableNameMap){
-                    content.append(tMap).append(",\n");
+                for(String[] tMap: tableNameMap){
+                    content.append(tMap[0]).append(":").append(tMap[1]).append(",\n");
                 }
                 content.append("\n\n字段关键字映射如下:\n");
-                for(String tMap: columnNameMap){
-                    content.append(tMap).append(",\n");
+                for(String[] tMap: columnNameMap){
+                    content.append(tMap[0]).append(":").append(tMap[1]).append(",\n");
                 }
             }
         }

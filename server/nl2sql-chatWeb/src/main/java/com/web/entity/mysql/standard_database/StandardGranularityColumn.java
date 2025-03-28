@@ -33,15 +33,15 @@ public class StandardGranularityColumn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer GranularityColumnId;
+    private Integer granularity_column_id;
 
-    private Integer granularityId; // 粒度id
+    private Integer granularity_id; // 粒度id
 
-    private String granularityName; // 粒度名
+    private String granularity_name; // 粒度名
 
-    private String standardColumnName; // 标准字段名
+    private String standard_column_name; // 标准字段名
 
-    private Integer standardColumnId; // 标准字段id
+    private Integer standard_column_id; // 标准字段id
 
 
 }

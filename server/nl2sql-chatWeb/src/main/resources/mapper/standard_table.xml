@@ -2,21 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.mysql.standard_database.StandardTableMapper">
 
-    <!-- ResultMap 映射 -->
-    <resultMap id="StandardTableResultMap" type="com.web.entity.mysql.standard_database.StandardTable">
-        <id property="standardTableId" column="standard_table_id"/>
-        <result property="originalTableName" column="original_table_name"/>
-        <result property="standardTableName" column="standard_table_name"/>
-        <result property="tableSchema" column="table_schema"/>
-        <result property="tableComment" column="table_comment"/>
-        <result property="columnRows" column="column_rows"/>
-        <result property="granularityName" column="granularity_name"/>
-        <result property="granularityId" column="granularity_id"/>
-        <result property="originalTableDDL" column="original_table_ddl"/>
-    </resultMap>
-
-
-    <select id="getAllStandardTables" resultMap="StandardTableResultMap">
+    <select id="getAllStandardTables" resultType="com.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,
@@ -31,7 +17,7 @@
             standard_table
     </select>
 
-    <select id="getStandardTableByOriginalTableName" parameterType="String" resultMap="StandardTableResultMap">
+    <select id="getStandardTableByOriginalTableName" parameterType="String" resultType="com.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,
@@ -48,7 +34,7 @@
             standard_table_name = #{name}
     </select>
 
-    <select id="getTableByStandardTableId" parameterType="Integer" resultMap="StandardTableResultMap">
+    <select id="getTableByStandardTableId" parameterType="Integer" resultType="com.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,

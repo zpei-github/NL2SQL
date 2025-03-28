@@ -113,8 +113,8 @@ public class GraphComponent {
         if (columns == null || columns.isEmpty())  return false;
         for (StandardColumn column : columns) {
             if(column == null)  continue;
-            FieldNode fieldNode = new FieldNode(column.getStandardColumnName());
-            fieldNode.setOriginalName(column.getOriginalColumnName());
+            FieldNode fieldNode = new FieldNode(column.getStandard_column_name());
+            fieldNode.setOriginalName(column.getOriginal_column_name());
             // 图添加字段
             graph.add(fieldNode);
         }
@@ -129,17 +129,17 @@ public class GraphComponent {
 
         for (Granularity gran : grans) {
             if(gran == null)  continue;
-            graph.add(new GranularityNode(gran.getGranularityName()));
+            graph.add(new GranularityNode(gran.getGranularity_name()));
         }
 
         for (StandardGranularityColumn granCol : granCols) {
 
             if(granCol == null)  continue;
-            GranularityNode gran = graph.findGranularityNode(granCol.getGranularityName());
+            GranularityNode gran = graph.findGranularityNode(granCol.getGranularity_name());
             if(gran == null)  {
                 continue;
             }
-            gran.addField(graph.findFieldNode(granCol.getStandardColumnName()));
+            gran.addField(graph.findFieldNode(granCol.getStandard_column_name()));
         }
         return true;
     }
@@ -151,15 +151,15 @@ public class GraphComponent {
         for (StandardTable table : tables) {
             if(table == null)  continue;
             // 图添加表
-            TableNode tableNode = new TableNode(table.getStandardTableName());
-            tableNode.setOriginalName(table.getOriginalTableName());
-            tableNode.setGranularity(graph.findGranularityNode(table.getGranularityName()));
-            tableNode.setRowCount(table.getColumnRows());
+            TableNode tableNode = new TableNode(table.getStandard_table_name());
+            tableNode.setOriginalName(table.getOriginal_table_name());
+            tableNode.setGranularity(graph.findGranularityNode(table.getGranularity_name()));
+            tableNode.setRowCount(table.getColumn_rows());
             graph.add(tableNode);
 
             try{
                 // 连接粒度和表
-                graph.link(tableNode, graph.findGranularityNode(table.getGranularityName()), DBGraph.FULL_GRANULARITY_TABLE_WEIGHT);
+                graph.link(tableNode, graph.findGranularityNode(table.getGranularity_name()), DBGraph.FULL_GRANULARITY_TABLE_WEIGHT);
             } catch (Exception e){
                 logger.error(e.getMessage());
             }
@@ -175,7 +175,7 @@ public class GraphComponent {
         for (StandardColumnTable colTable : colTables) {
             if(colTable == null)  continue;
             try{
-                graph.link(graph.findFieldNode(colTable.getStandardColumnName()), graph.findTableNode(colTable.getStandardTableName()), 0);
+                graph.link(graph.findFieldNode(colTable.getStandard_column_name()), graph.findTableNode(colTable.getStandard_table_name()), 0);
             } catch (Exception e){
                 logger.error(e.getMessage());
             }
@@ -227,11 +227,11 @@ public class GraphComponent {
         Map<GranularityNode, List<TableNode>> filter = new HashMap<>();
 
         for(StandardTable table :standardTables){
-            this.addKeyNodes(keyNodes, "table", table.getStandardTableName());
+            this.addKeyNodes(keyNodes, "table", table.getStandard_table_name());
         }
 
         for(StandardColumn column : standardColumns){
-            this.addKeyNodes(keyNodes, "column", column.getStandardColumnName());
+            this.addKeyNodes(keyNodes, "column", column.getStandard_column_name());
         }
 
 

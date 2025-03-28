@@ -29,10 +29,10 @@ import jakarta.persistence.Id;
 public class Granularity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer granularityId; // 主键id
+    private Integer granularity_id; // 主键id
 
-    private String granularityName; // 粒度名
+    private String granularity_name; // 粒度名
 
-    private String granularityComment; // 粒度备注
+    private String granularity_comment; // 粒度备注
 }
 
