@@ -126,7 +126,7 @@ public class ChatController {
             }
         }
 
-        keywords = llmService.response(question, history, "qwen-max");
+        keywords = llmService.response(question, history);
         keywords.setMessageId(question.getMessageId() + 1);
         keywords.setMessageMark(MessageMark.MM10003);
 
@@ -139,7 +139,7 @@ public class ChatController {
         int retryTimes = 0;
         MyMessage correct = new MyMessage(question.getMessageId(), ProjectConstant.USER_SENDER, null, "输出结果格式不符合要求，重新输出");
         while (!StringTools.isValidFormat(keywords.getContent())) {
-            keywords = llmService.response(correct, history, "qwen-max");
+            keywords = llmService.response(correct, history);
             correct.setMessageId(keywords.getMessageId() - 1);
             correct.setCreateTime(System.currentTimeMillis());
 
@@ -218,7 +218,7 @@ public class ChatController {
         }
 
         returnData.add(question);
-        response = llmService.response(localQuestion, history, "qwen-max");
+        response = llmService.response(localQuestion, history);
         response.setMessageMark(MessageMark.MM10005);
         returnData.add(response);
 
