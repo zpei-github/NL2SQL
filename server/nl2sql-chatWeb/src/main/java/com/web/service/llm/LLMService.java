@@ -27,6 +27,7 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.web.constant.ProjectConstant;
 import com.web.vo.MyMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,7 +35,14 @@ import java.util.List;
 
 @Service
 public class LLMService {
-    public MyMessage response(MyMessage question, List<MyMessage> existMessages, String model) throws Exception {
+
+    @Value("${llm.apikey}")
+    private String apikey;
+
+    @Value("${llm.model}")
+    private String model;
+
+    public MyMessage response(MyMessage question, List<MyMessage> existMessages) throws Exception {
         MyMessage response = new MyMessage();
 
         List<Message> tongyiMessages = new ArrayList<>();
@@ -48,7 +56,7 @@ public class LLMService {
         }
         tongyiMessages.add(createMessage(Role.USER, question.getContent()));
 
-        GenerationParam param = createGenerationParam(tongyiMessages, model);
+        GenerationParam param = createGenerationParam(tongyiMessages, this.model);
         GenerationResult result = callGenerationWithMessages(param);
 
         response.setMessageId(question.getMessageId() + 1);
@@ -59,22 +67,22 @@ public class LLMService {
     }
 
 
-    public static GenerationParam createGenerationParam(List<Message> messages, String model) {
+    public GenerationParam createGenerationParam(List<Message> messages, String model) {
         return GenerationParam.builder()
                 .model(model)
                 .messages(messages)
-                .apiKey(System.getenv("DASHSCOPE_API_KEY"))
+                .apiKey(this.apikey)
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .topP(0.8)
                 .build();
     }
 
-    public static GenerationResult callGenerationWithMessages(GenerationParam param) throws ApiException, NoApiKeyException, InputRequiredException {
+    public GenerationResult callGenerationWithMessages(GenerationParam param) throws ApiException, NoApiKeyException, InputRequiredException {
         Generation gen = new Generation();
         return gen.call(param);
     }
 
-    public static Message createMessage(Role role, String content) {
+    public Message createMessage(Role role, String content) {
         return Message.builder().role(role.getValue()).content(content).build();
     }
 
