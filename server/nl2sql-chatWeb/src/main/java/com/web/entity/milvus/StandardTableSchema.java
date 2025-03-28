@@ -17,6 +17,4 @@ public class StandardTableSchema {
     private String table_comment;
 
     private String table_schema;
-
-
 }

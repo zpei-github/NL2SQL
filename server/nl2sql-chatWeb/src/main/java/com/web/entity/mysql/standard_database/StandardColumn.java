@@ -30,14 +30,14 @@ public class StandardColumn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer standardColumnId; // 标准字段id
+    private Integer standard_column_id; // 标准字段id
 
-    private String standardColumnName; // 标准字段名
+    private String standard_column_name; // 标准字段名
 
-    private String originalColumnName; // 源库字段名
+    private String original_column_name; // 源库字段名
 
-    private String columnComment; // 字段备注
+    private String column_comment; // 字段备注
 
-    private String tableSchema; // 源库名
+    private String table_schema; // 源库名
 }
 

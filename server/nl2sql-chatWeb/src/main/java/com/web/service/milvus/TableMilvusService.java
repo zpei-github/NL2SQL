@@ -66,6 +66,7 @@ public class TableMilvusService {
         milvusSearchKit.setOutputFields(milvusSearchKit.outputFieldsConstruct(StandardTableSchema.class));
     }
 
+
     @PreDestroy
     private void destroy(){
         // 服务销毁之后会释放milvus上的collection
@@ -83,6 +84,7 @@ public class TableMilvusService {
         }
         return results;
     }
+
 
     public List<StandardTableSchema> hybridSearch(String query, int topK){
         List<StandardTableSchema> results = new ArrayList<>();

@@ -12,9 +12,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OllamaEmbeddingService {
 
-
     private final OllamaEmbeddingConfig ollamaConfig;
-
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 

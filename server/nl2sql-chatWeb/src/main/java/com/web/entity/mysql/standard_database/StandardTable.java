@@ -16,7 +16,6 @@
 
 package com.web.entity.mysql.standard_database;
 import lombok.Data;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,22 +28,22 @@ import jakarta.persistence.Table;
 public class StandardTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer standardTableId; // 标准规范表id
+    private Integer standard_table_id; // 标准规范表id
 
-    private String originalTableName; // 源库表名
+    private String original_table_name; // 源库表名
 
-    private String standardTableName; // 标准规范表名
+    private String standard_table_name; // 标准规范表名
 
-    private String tableSchema; // 源库名
+    private String table_schema; // 源库名
 
-    private String tableComment; // 表备注
+    private String table_comment; // 表备注
 
-    private Long columnRows; // 表数据量
+    private Long column_rows; // 表数据量
 
-    private String granularityName; // 表的粒度
+    private String granularity_name; // 表的粒度
 
-    private Integer granularityId; // 粒度id
+    private Integer granularity_id; // 粒度id
 
-    private String originalTableDDL; //表的建表语句
+    private String original_table_ddl; //表的建表语句
 }
 

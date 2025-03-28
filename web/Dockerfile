@@ -9,7 +9,6 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # 构建命令
-
 ARG NODE_ENV
 RUN yarn build
 

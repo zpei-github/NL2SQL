@@ -65,7 +65,6 @@ public class MilvusSearchKit {
     }
 
 
-
     public SearchResp annSearch(String query, Integer topK){
         FloatVec queryVector;
         try {
