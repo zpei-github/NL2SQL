@@ -30,9 +30,7 @@ public class MilvusConfig {
     String token;
 
     /*
-    *  milvus-sdk-java和mysql-connector-java两个依赖会产生Protobuf依赖冲突。导致milvus的服务无法连接
-     * 需要将mysql-connector-java中的<groupId>com.google.protobuf</groupId><artifactId>protobuf-java</artifactId>
-    * 排除才能使Milvus运行，经过测试Milvus的Protobuf可以支撑mysql运行
+
     * */
     @Bean
     public MilvusClientV2 getClient() {

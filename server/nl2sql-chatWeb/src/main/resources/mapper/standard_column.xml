@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.web.mapper.mysql.standard_database.StandardColumnMapper">
-    <!-- 显式映射查询结果到实体类 -->
-    <resultMap id="standardColumnResultMap" type="com.web.entity.mysql.standard_database.StandardColumn">
-        <result property="standardColumnId" column="standard_column_id"/>
-        <result property="standardColumnName" column="standard_column_name"/>
-        <result property="originalColumnName" column="original_column_name"/>
-        <result property="columnComment" column="column_comment"/>
-        <result property="tableSchema" column="table_schema"/>
-    </resultMap>
-    
-    <select id="getAllStandardColumn" resultMap="standardColumnResultMap">
+    <select id="getAllStandardColumn" resultType="com.web.entity.mysql.standard_database.StandardColumn">
         SELECT
             standard_column_id,
             standard_column_name,
@@ -21,7 +12,7 @@
             standard_column
     </select>
 
-    <select id="getStandardColumnByStandardColumnName" parameterType="String" resultMap="standardColumnResultMap">
+    <select id="getStandardColumnByStandardColumnName" parameterType="String" resultType="com.web.entity.mysql.standard_database.StandardColumn">
         SELECT
             standard_column_id,
             standard_column_name,
@@ -34,7 +25,7 @@
             standard_column = #{name}
     </select>
 
-    <select id="getStandardColumnByStandardColumnId" parameterType="Integer" resultMap="standardColumnResultMap">
+    <select id="getStandardColumnByStandardColumnId" parameterType="Integer" resultType="com.web.entity.mysql.standard_database.StandardColumn">
         SELECT
             standard_column_id,
             standard_column_name,
