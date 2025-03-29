@@ -25,7 +25,7 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
-import com.web.constant.ProjectConstant;
+import com.web.constant.LLMConstant;
 import com.web.vo.MyMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,9 +49,9 @@ public class LLMService {
 
         for (MyMessage m : existMessages) {
             switch (m.getSender()) {
-                case ProjectConstant.USER_SENDER -> tongyiMessages.add(createMessage(Role.USER, m.getContent()));
-                case ProjectConstant.CLIENT_SENDER -> tongyiMessages.add(createMessage(Role.ASSISTANT, m.getContent()));
-                case ProjectConstant.SYSTEM_SENDER -> tongyiMessages.add(createMessage(Role.SYSTEM, m.getContent()));
+                case LLMConstant.USER_SENDER -> tongyiMessages.add(createMessage(Role.USER, m.getContent()));
+                case LLMConstant.CLIENT_SENDER -> tongyiMessages.add(createMessage(Role.ASSISTANT, m.getContent()));
+                case LLMConstant.SYSTEM_SENDER -> tongyiMessages.add(createMessage(Role.SYSTEM, m.getContent()));
             }
         }
         tongyiMessages.add(createMessage(Role.USER, question.getContent()));
@@ -60,7 +60,7 @@ public class LLMService {
         GenerationResult result = callGenerationWithMessages(param);
 
         response.setMessageId(question.getMessageId() + 1);
-        response.setSender(ProjectConstant.CLIENT_SENDER);
+        response.setSender(LLMConstant.CLIENT_SENDER);
         response.setContent(getContent(result));
         response.setCreateTime(System.currentTimeMillis());
         return response;

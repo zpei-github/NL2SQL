@@ -48,18 +48,12 @@ public class DBGraph extends MatrixGraph {
     private final Map<String, GranularityNode> granularityIndex;
     private final Map<String, TableNode> tableIndex;
 
-    /** 字段-表map
-     * key 为字段，List为存在该字段的表
-     */
-    private final Map<Node, List<Node>> field_tables;
-
 
     public DBGraph() {
         super();
         fieldIndex = new HashMap<>();
         granularityIndex = new HashMap<>();
         tableIndex = new HashMap<>();
-        field_tables = new HashMap<>();
     }
 
     /** 连接节点时会进行区分
@@ -75,18 +69,37 @@ public class DBGraph extends MatrixGraph {
     public boolean link(Node n1, Node n2 , Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
         if (n1 == null || n2 == null || weight == null) return false;
 
-        if (n1.getClass().equals(FieldNode.class) && n2.getClass().equals(TableNode.class)) {
-            return link_field_table((TableNode)n2,  (FieldNode) n1, weight);
-        } else if (n2.getClass().equals(FieldNode.class)  && n1.getClass().equals(TableNode.class)) {
-            return link_field_table((TableNode)n1,  (FieldNode) n2, weight);
-        } else if (n2.getClass().equals(GranularityNode.class) && n1.getClass().equals(TableNode.class)) {
-            return link_table_granularity((TableNode)n1,  (GranularityNode)n2, weight);
-        } else if (n1.getClass().equals(GranularityNode.class) && n2.getClass().equals(TableNode.class)) {
-            return link_table_granularity((TableNode)n2,  (GranularityNode)n1, weight);
-        }
-        return false;
-    }
+        int n1_mark = -1;
+        int n2_mark = -1;
 
+
+        // 两数个集合数相加需要得出不一样的结果
+        if((n1 instanceof FieldNode)){
+            n1_mark = 1;
+        }else if((n1 instanceof TableNode)){
+            n1_mark = 3;
+        } else if((n1 instanceof GranularityNode)){
+            n1_mark = 8;
+        }
+
+        if((n2 instanceof FieldNode)){
+            n2_mark = 2;
+        } else if((n2 instanceof TableNode)){
+            n2_mark = 5;
+        } else if((n2 instanceof GranularityNode)){
+            n2_mark = 13;
+        }
+
+        return switch (n1_mark + n2_mark) {
+            case 5 -> link_field_table((TableNode) n1, (FieldNode) n2, weight);
+            case 6 -> link_field_table((TableNode) n2, (FieldNode) n1, weight);
+            case 10 -> link_field_granularity((FieldNode) n2, (GranularityNode) n1, weight);
+            case 13 -> link_table_granularity((TableNode) n2, (GranularityNode) n1, weight);
+            case 14 -> link_field_granularity((FieldNode) n1, (GranularityNode) n2, weight);
+            case 16 -> link_table_granularity((TableNode) n1, (GranularityNode) n2, weight);
+            default -> false;
+        };
+    }
 
     /** 添加一个节点
      * 在添加时会进行区分
@@ -97,14 +110,13 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean add(Node n){
         if (n == null) return false;
-        if(n.getClass().equals(FieldNode.class)){
+        if(n instanceof FieldNode){
             return addFieldNode((FieldNode) n);
-        }else if(n.getClass().equals(TableNode.class)){
+        }else if(n instanceof TableNode){
             return addTableNode((TableNode) n);
-        }else if(n.getClass().equals(GranularityNode.class)){
+        }else if(n instanceof GranularityNode){
             return addGranularityNode((GranularityNode) n);
-        }
-        return false;
+        }else return false;
     }
 
     /** 移除一个节点
@@ -116,11 +128,11 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean remove(Node n) throws NoIndexException, IndexOutOfBoundsException{
         if (n == null) return false;
-        if(n.getClass().equals(FieldNode.class)){
+        if(n instanceof FieldNode){
             return removeFieldNode((FieldNode) n);
-        } else if(n.getClass().equals(TableNode.class)){
+        } else if(n instanceof TableNode){
             return removeTableNode((TableNode) n);
-        } else if(n.getClass().equals(GranularityNode.class)){
+        } else if(n instanceof GranularityNode){
             return removeGranularityNode((GranularityNode) n);
         }
         return false;
@@ -137,19 +149,19 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/8
      **/
     public boolean link_field_table(TableNode table, FieldNode field , Integer weight){
-        if(!field_tables.containsKey(field) || !node2index.containsKey(table)
-        ) return false;
+        if(!fieldIndex.containsKey(field.getFieldName()) || !node2index.containsKey(table)) return false;
 
-        GranularityNode g = (GranularityNode) table.getGranularity();
-
-        if(g.getFields().contains(field)){
-            // 添加映射
-            field_tables.get(field).add(0, table);
+        // 添加映射
+        if(field.addTable(table)){
+            if(!table.addField(field)){
+                field.removeTable(table);
+                return false;
+            }else {
+                return true;
+            }
         }else {
-            field_tables.get(field).add(table);
+            return false;
         }
-
-        return true;
     }
 
 
@@ -164,6 +176,21 @@ public class DBGraph extends MatrixGraph {
      **/
     public boolean link_table_granularity(TableNode table, GranularityNode gran, Integer weight) throws IndexOutOfBoundsException, NoIndexException, TwoNodeOperateException {
         return super.link(table, gran, weight);
+    }
+
+
+
+    /** 将字段添加至粒度的Set
+     *
+     * @param field
+     * @param gran
+     * @param weight
+     * @return
+     * @author zpei
+     * @create 2025/3/28
+     **/
+    public boolean link_field_granularity(FieldNode field, GranularityNode gran, Integer weight){
+        return gran.addField(field);
     }
 
 
@@ -182,9 +209,6 @@ public class DBGraph extends MatrixGraph {
 
         //已经添加过的字段节点不再添加
         fieldIndex.put(node.getFieldName(), node);
-
-        // 给字段新建一个映射List
-        field_tables.put(node, new LinkedList<>());
         return true;
     }
 
@@ -278,10 +302,12 @@ public class DBGraph extends MatrixGraph {
         if (node == null) return false;
         if(node.getGranularityName() == null || granularityIndex.containsKey(node.getGranularityName())) return false;
 
-        allocateIndex(node);
-
-        granularityIndex.put(node.getGranularityName(), node);
-        return true;
+        if(allocateIndex(node) >= 0){
+            granularityIndex.put(node.getGranularityName(), node);
+            return true;
+        }else {
+            return false;
+        }
     }
 
     /** 移除一个粒度节点
@@ -327,12 +353,13 @@ public class DBGraph extends MatrixGraph {
         Map<TableNode, int[]> tableCounts = new HashMap<>();
 
         for (Map.Entry<String, GranularityNode> grans : granularityIndex.entrySet()) {
-            int fieldCount = grans.getValue().fieldCount();
             GranularityNode gran = grans.getValue();
+            int fieldCount = gran.fieldCount();
 
             // 获取粒度包含的字段连接的表
             for (Node field : gran.getFields()) {
-                List<Node> tables = field_tables.get(field);
+
+                Set<Node> tables = ((FieldNode) field).getTables();
                 for(Node node : tables){
                     TableNode table = (TableNode) node;
                     GranularityNode t_gran = (GranularityNode) table.getGranularity();
@@ -381,12 +408,8 @@ public class DBGraph extends MatrixGraph {
         // 倒排索引后得到的表节点集合
         Set<Node> keyNodes = new HashSet<>();
 
-        // 倒排索引-字段节点记录表
-        HashMap<Node, List<Node>> record = new HashMap<>();
-
         // 倒排索引-打分表
         HashMap<Node, Double> score = new HashMap<>();
-
 
         // 挑出关键字集合中的表和粒度节点
         for(Node node : nodes){
@@ -397,47 +420,47 @@ public class DBGraph extends MatrixGraph {
 
         for(Node node : keyNodes){
             nodes.remove(node);
+            if(node instanceof TableNode t){
+                if(t.getFields() == null || t.getFields().isEmpty()) continue;
+                nodes.removeIf(t.getFields()::contains);
+            }
         }
 
-        return invertedIndex(keyNodes, field_tables, nodes, fieldIndex, record, score);
+        return invertedIndex(keyNodes, nodes, fieldIndex, score);
     }
 
 
     /** 递归倒排索引打分获取目标表节点
      * 倒排索引打分可以自定义
      * @param keyNodes 输出的关键节点
-     * @param field_tables 字段-表映射
      * @param nodes 输入的源节点
      * @param fieldIndex 字段名索引
-     * @param record 暂存记录
      * @param score 分数暂存记录
      * @return 关键节点集合
      * @author zpei
      * @create 2025/3/9
      **/
-    private Set<Node> invertedIndex(Set<Node> keyNodes, Map<Node, List<Node>> field_tables, Set<Node> nodes, Map<String, FieldNode> fieldIndex, HashMap<Node, List<Node>> record, HashMap<Node, Double> score){
+    private Set<Node> invertedIndex(Set<Node> keyNodes,  Set<Node> nodes, Map<String, FieldNode> fieldIndex,  HashMap<Node, Double> score){
         if(nodes.isEmpty()) return keyNodes;
 
         double max = 0d;
         Node maxTable = null;
 
-        for(Node node: nodes){
-            if(!(node instanceof FieldNode)) continue;
-            FieldNode field = (FieldNode) node;
+        Iterator<Node> iter = nodes.iterator();
+        while (iter.hasNext()) {
+            Node f = iter.next();
+            if(!(f instanceof FieldNode field)) continue;
 
-            if(!fieldIndex.containsKey(field.getFieldName()) || field_tables.get(field).isEmpty()) {
-                nodes.remove(node);
+            if(field.getFieldName() == null
+                    || field.getTables() == null
+                    || !fieldIndex.containsKey(field.getFieldName())
+                    || field.getTables().isEmpty()) {
+                iter.remove();
                 continue;
             }
 
             // 将字段节点涉及到的表添加到打分表中
-            for(Node table : field_tables.get(field)){
-                if(!record.containsKey(table)){
-                    record.put(table, new ArrayList<>());
-                }
-
-                record.get(table).add(node);
-
+            for(Node table : field.getTables()){
                 if(!score.containsKey(table)){
                     score.put(table, 0d);
                 }
@@ -445,11 +468,10 @@ public class DBGraph extends MatrixGraph {
                 double s = 10d;
 
                 TableNode t1 = (TableNode) table;
-                TableNode t2 = (TableNode) maxTable;
 
                 // 倒排索引打分策略1: 如果字段属于表粒度，则加2分
                 GranularityNode granOfT1 = (GranularityNode) t1.getGranularity();
-                if(granOfT1.getFields().contains(field)) s += 2d;
+                if(granOfT1.getFields() != null && granOfT1.getFields().contains(field)) s += 2d;
 
                 // 倒排索引打分策略2: 数据量评价
                 s += Math.log10(t1.getRowCount()) / 10;
@@ -463,15 +485,16 @@ public class DBGraph extends MatrixGraph {
             }
         }
 
-        for(Node node : record.get(maxTable)){
-            nodes.remove(node);
+        if(maxTable != null){
+            Set<Node> fieldOfTable = ((TableNode)maxTable).getFields();
+            if(fieldOfTable != null && !fieldOfTable.isEmpty()){
+                nodes.removeIf(fieldOfTable::contains);
+                keyNodes.add(maxTable);
+            }
         }
 
-        record.clear();
         score.clear();
-        keyNodes.add(maxTable);
-
-        return invertedIndex(keyNodes, field_tables, nodes, fieldIndex, record, score);
+        return invertedIndex(keyNodes, nodes, fieldIndex, score);
     }
 
 
@@ -482,10 +505,10 @@ public class DBGraph extends MatrixGraph {
      * @create 2024/12/12
      **/
     public void printFields(){
-        for(Map.Entry<Node, List<Node>> entry : field_tables.entrySet()){
-            FieldNode field = (FieldNode) entry.getKey();
+        for(Map.Entry<String, FieldNode> entry : fieldIndex.entrySet()){
+            FieldNode field =  entry.getValue();
             System.out.print(field.getFieldName() + " <--> ");
-            for(Node node : entry.getValue()){
+            for(Node node : field.getTables()){
                 TableNode table = (TableNode) node;
                 System.out.print(table + " ");
             }
