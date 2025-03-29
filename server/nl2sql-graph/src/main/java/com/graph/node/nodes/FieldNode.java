@@ -14,9 +14,11 @@
  *   limitations under the License.
  */
 package com.graph.node.nodes;
+import com.graph.node.Node;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Objects;
+
+import java.util.*;
 
 /** 字段节点
  * 用于存储字段信息的节点, 其邻居节点都是表节点
@@ -28,11 +30,29 @@ import java.util.Objects;
 public class FieldNode extends AbstractNode {
     private String fieldName;
     private String originalName;
+    private Set<Node> tables;
 
-    public FieldNode() {}
+    public FieldNode() {
+        this(null);
+    }
 
     public FieldNode(String fieldName) {
         this.fieldName = fieldName;
+        tables = new HashSet<>();
+    }
+
+    public boolean addTable(Node table) {
+        if(!(table instanceof TableNode)) {
+            return false;
+        }
+        return tables.add(table);
+    }
+
+    public boolean removeTable(Node table) {
+        if(!(table instanceof TableNode)) {
+            return false;
+        }
+        return tables.remove(table);
     }
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法

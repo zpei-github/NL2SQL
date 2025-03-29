@@ -49,14 +49,14 @@ public class GranularityNode extends AbstractNode {
     }
 
     public boolean addField(Node field) {
-        if (field == null) {
+        if (!(field instanceof FieldNode)) {
             return false;
         }
         return fields.add(field);
     }
 
     public boolean removeField(Node field) {
-        if (field == null) {
+        if (!(field instanceof FieldNode)) {
             return false;
         }
         return fields.remove(field);
