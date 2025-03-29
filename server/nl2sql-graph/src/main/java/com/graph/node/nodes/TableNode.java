@@ -17,7 +17,7 @@ package com.graph.node.nodes;
 
 
 import java.lang.Object;
-import java.util.Objects;
+import java.util.*;
 
 import com.graph.node.Node;
 import lombok.Getter;
@@ -37,6 +37,7 @@ public class TableNode extends AbstractNode {
     private String originalName;
     private Node granularity;
     private Long rowCount;
+    private Set<Node> fields;
 
     public TableNode() {
         this(null);
@@ -44,6 +45,21 @@ public class TableNode extends AbstractNode {
 
     public TableNode(String tableName) {
         this.tableName = tableName;
+        fields = new HashSet<>();
+    }
+
+    public boolean addField(Node field) {
+        if(!(field instanceof FieldNode)) {
+            return false;
+        }
+        return fields.add(field);
+    }
+
+    public boolean removeField(Node field) {
+        if(!(field instanceof FieldNode)) {
+            return false;
+        }
+        return fields.remove(field);
     }
 
     // 因为父类的equals方法在此处被覆写，所以被调用之后用的是子类的equals方法
