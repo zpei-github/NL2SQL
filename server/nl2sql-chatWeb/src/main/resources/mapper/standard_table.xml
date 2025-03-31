@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.web.mapper.mysql.standard_database.StandardTableMapper">
+<mapper namespace="com.zpei.nl2sql.web.mapper.mysql.standard_database.StandardTableMapper">
 
-    <select id="getAllStandardTables" resultType="com.web.entity.mysql.standard_database.StandardTable">
+    <select id="getAllStandardTables" resultType="com.zpei.nl2sql.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,
@@ -17,7 +17,7 @@
             standard_table
     </select>
 
-    <select id="getStandardTableByOriginalTableName" parameterType="String" resultType="com.web.entity.mysql.standard_database.StandardTable">
+    <select id="getStandardTableByOriginalTableName" parameterType="String" resultType="com.zpei.nl2sql.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,
@@ -34,7 +34,7 @@
             standard_table_name = #{name}
     </select>
 
-    <select id="getTableByStandardTableId" parameterType="Integer" resultType="com.web.entity.mysql.standard_database.StandardTable">
+    <select id="getTableByStandardTableId" parameterType="Integer" resultType="com.zpei.nl2sql.web.entity.mysql.standard_database.StandardTable">
         SELECT
             standard_table_id,
             original_table_name,
