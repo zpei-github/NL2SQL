@@ -1,4 +1,9 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+
 -- granularity: table
+DROP TABLE IF EXISTS `granularity`
 CREATE TABLE `granularity` (
   `granularity_id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `granularity_name` varchar(255) NOT NULL,
@@ -7,6 +12,7 @@ CREATE TABLE `granularity` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='粒度表';
 
 -- standard_column: table
+DROP TABLE IF EXISTS `standard_column`
 CREATE TABLE `standard_column` (
   `standard_column_id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `standard_column_name` varchar(255) DEFAULT NULL COMMENT '标准表名',
@@ -17,6 +23,7 @@ CREATE TABLE `standard_column` (
 ) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='标准字段映射';
 
 -- standard_column_table: table
+DROP TABLE IF EXISTS `standard_column_table`
 CREATE TABLE `standard_column_table` (
   `standard_column_table_id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `standard_table_name` varchar(255) NOT NULL COMMENT '标准表名',
@@ -27,6 +34,7 @@ CREATE TABLE `standard_column_table` (
 ) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='标准字段和表的映射';
 
 -- standard_granularity_column: table
+DROP TABLE IF EXISTS `standard_granularity_column`
 CREATE TABLE `standard_granularity_column` (
   `granularity_id` int NOT NULL COMMENT '粒度id',
   `granularity_name` varchar(255) NOT NULL COMMENT '粒度名',
@@ -37,6 +45,7 @@ CREATE TABLE `standard_granularity_column` (
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='粒度与字段的关系';
 
 -- standard_table: table
+DROP TABLE IF EXISTS `standard_table`
 CREATE TABLE `standard_table` (
   `standard_table_id` int NOT NULL AUTO_INCREMENT COMMENT '标准规范表id',
   `original_table_name` varchar(255) NOT NULL COMMENT '源库表名',
@@ -49,4 +58,5 @@ CREATE TABLE `standard_table` (
   `original_table_ddl` text COMMENT '表的ddl语句',
   PRIMARY KEY (`standard_table_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='标准表映射';
+
 

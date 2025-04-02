@@ -15,6 +15,41 @@
  */
 package com.zpei.nl2sql.web.tools;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.Id;
+
+/**
+ * 用于反射的工具类
+ * @Author zpei
+ * @date 2025/4/1
+ */
+
 
 public class ReflectTools {
+
+    // 反射获取类中的所有属性名称
+    public static List<String> outputFieldsNameList(Class entityClass){
+        Field[] fields = entityClass.getDeclaredFields();
+        List<String> outputFields = new ArrayList<>();
+        for(Field field : fields){
+            outputFields.add(field.getName());
+        }
+        return outputFields;
+    }
+
+
+    // 反射获取类被org.springframework.data.annotation.Id注解的属性
+    public static String getIDInEntity(Class entityClass){
+        Field[] fields = entityClass.getDeclaredFields();
+        String name = null;
+        for(Field field : fields){
+            if(field.isAnnotationPresent(jakarta.persistence.Id.class)) {
+                name = field.getName();
+                break;
+            }
+        }
+        return name;
+    }
 }
