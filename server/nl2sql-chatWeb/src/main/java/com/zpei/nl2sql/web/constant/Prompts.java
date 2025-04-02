@@ -47,6 +47,4 @@ public interface Prompts {
 
     String SERVICE_RETRY_PROMPT = "服务出现异常，请检查查询需求后重试";
 
-
-
 }

@@ -19,6 +19,7 @@ package com.zpei.nl2sql.web.service.milvus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zpei.nl2sql.web.entity.milvus.StandardColumnSchema;
 import com.zpei.nl2sql.web.service.llm.OllamaEmbeddingService;
+import com.zpei.nl2sql.web.tools.ReflectTools;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.collection.request.LoadCollectionReq;
 import io.milvus.v2.service.collection.request.ReleaseCollectionReq;
@@ -59,10 +60,16 @@ public class ColumnMilvusService{
                 .collectionName(collectionName)
                 .build());
 
-        milvusSearchKit = new MilvusSearchKit(client, embedding, collectionName, denseVectorField, sparseVectorField);
+        milvusSearchKit = new MilvusSearchKit(client,
+                embedding,
+                collectionName,
+                denseVectorField,
+                sparseVectorField,
+                ReflectTools.outputFieldsNameList(StandardColumnSchema.class)
+        );
 
         // 通过反射设置需要从collection中获取结果的字段
-        milvusSearchKit.setOutputFields(milvusSearchKit.outputFieldsConstruct(StandardColumnSchema.class));
+        milvusSearchKit.setOutputFields(ReflectTools.outputFieldsNameList(StandardColumnSchema.class));
     }
 
     @PreDestroy

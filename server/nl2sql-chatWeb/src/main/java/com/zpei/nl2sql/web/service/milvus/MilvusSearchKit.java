@@ -30,15 +30,18 @@ import io.milvus.v2.service.vector.request.ranker.BaseRanker;
 import io.milvus.v2.service.vector.request.ranker.WeightedRanker;
 import io.milvus.v2.service.vector.response.SearchResp;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class MilvusSearchKit {
     private MilvusClientV2 client;
 
@@ -54,12 +57,13 @@ public class MilvusSearchKit {
 
     public MilvusSearchKit(){}
 
-    public MilvusSearchKit(MilvusClientV2 client, OllamaEmbeddingService embedding, String collectionName, String denseVectorField, String sparseVectorField){
+    public MilvusSearchKit(MilvusClientV2 client, OllamaEmbeddingService embedding, String collectionName, String denseVectorField, String sparseVectorField, List<String> outputFields) {
         this.client = client;
         this.embedding = embedding;
         this.collectionName = collectionName;
         this.denseVectorField = denseVectorField;
         this.sparseVectorField = sparseVectorField;
+        this.outputFields = outputFields;
     }
 
 
@@ -119,16 +123,5 @@ public class MilvusSearchKit {
                 .consistencyLevel(ConsistencyLevel.BOUNDED)
                 .outFields(outputFields)
                 .build());
-    }
-
-
-    // 反射实体
-    public List<String> outputFieldsConstruct(Class entityClass){
-        Field[] fields = entityClass.getDeclaredFields();
-        List<String> outputFields = new ArrayList<>();
-        for(Field field : fields){
-            outputFields.add(field.getName());
-        }
-        return outputFields;
     }
 }
