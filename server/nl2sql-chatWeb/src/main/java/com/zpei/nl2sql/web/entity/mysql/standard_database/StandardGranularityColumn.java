@@ -28,7 +28,6 @@ import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "standard_granularity_column")
 public class StandardGranularityColumn {
 
     @Id

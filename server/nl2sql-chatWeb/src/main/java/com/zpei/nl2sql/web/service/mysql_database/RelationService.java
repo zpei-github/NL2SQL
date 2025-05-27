@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
  * @Author zpei
  * @date 2025/3/28
  */
-
 @Service
 public class RelationService {
 }

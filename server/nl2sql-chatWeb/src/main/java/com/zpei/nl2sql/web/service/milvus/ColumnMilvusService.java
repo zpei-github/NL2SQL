@@ -67,7 +67,6 @@ public class ColumnMilvusService{
                 sparseVectorField,
                 ReflectTools.outputFieldsNameList(StandardColumnSchema.class)
         );
-
         // 通过反射设置需要从collection中获取结果的字段
         milvusSearchKit.setOutputFields(ReflectTools.outputFieldsNameList(StandardColumnSchema.class));
     }

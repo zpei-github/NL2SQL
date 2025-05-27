@@ -25,13 +25,13 @@ import com.zpei.nl2sql.graph.node.nodes.TableNode;
 import com.zpei.nl2sql.web.entity.mysql.standard_database.*;
 import com.zpei.nl2sql.web.mapper.mysql.standard_database.*;
 import com.zpei.nl2sql.web.my_exception.InitializeException;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,7 @@ public class GraphComponent {
             logger.error(e.getMessage());
             throw new InitializeException("图初始化异常");
         }
-        treeSolver.initial(graph);
+        treeSolver.initialize(graph);
 
         logger.info("GraphService initialized...");
     }
@@ -200,6 +200,30 @@ public class GraphComponent {
         }
         keyNodes.add(aim);
         return keyNodes;
+    }
+
+
+    /**
+     * 判断某个字段是否属于某个表
+     * @param column 字段
+     * @param table 表
+     * @return 是否属于
+     * @author zpei
+     * @create 2025/4/10
+     **/
+    public boolean isFieldBelongToTable(StandardColumn column, StandardTable table) {
+        if(column == null
+                || table == null
+                || column.getStandard_column_name() == null
+                || table.getStandard_table_name() == null)  return false;
+
+        TableNode tableNode = graph.findTableNode(table.getStandard_table_name());
+        FieldNode fieldNode = graph.findFieldNode(column.getStandard_column_name());
+        if(fieldNode == null
+                || tableNode == null
+                || fieldNode.getTables() == null
+                || tableNode.getFields() == null) return false;
+        return fieldNode.getTables().contains(tableNode) && tableNode.getFields().contains(fieldNode);
     }
 
     // 倒排索引获取需要求解的表

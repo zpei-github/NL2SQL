@@ -68,7 +68,6 @@ public class TableMilvusService {
                 sparseVectorField,
                 ReflectTools.outputFieldsNameList(StandardTableSchema.class)
         );
-
     }
 
 

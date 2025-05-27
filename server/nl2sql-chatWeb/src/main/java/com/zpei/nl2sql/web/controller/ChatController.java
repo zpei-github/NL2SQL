@@ -175,7 +175,9 @@ public class ChatController {
         // 删除历史聊天记录中无关的信息，防止无关信息的干扰，减少token使用量
         boolean mark = false;
         for(int i = history.size() - 1; i >= 0; i--){
-            if(MessageMark.MM10000.equals(history.get(i).getMessageMark()) || (mark && MessageMark.MM10001.equals(history.get(i).getMessageMark()))){
+            if(MessageMark.MM10000.equals(history.get(i).getMessageMark())
+                    || (mark && MessageMark.MM10001.equals(history.get(i).getMessageMark()))
+                    || MessageMark.MM10003.equals(history.get(i).getMessageMark())){
                 history.remove(i);
             } else if (MessageMark.MM10001.equals(history.get(i).getMessageMark())) {
                 mark = true;
@@ -245,6 +247,7 @@ public class ChatController {
                                 && (stColumn = cMilService.hybridSearch(column, 3)) != null
                                 && !stColumn.isEmpty()){
                             StandardColumn stc = columnService.getStandardColumnByStandardColumnId(stColumn.get(0).getStandard_column_id());
+                            if(!gComponent.isFieldBelongToTable(stc, stt)) columns.add(stc);
                             columnNameMap.add(new String[]{column,stc.getOriginal_column_name()});
                         }
                     }

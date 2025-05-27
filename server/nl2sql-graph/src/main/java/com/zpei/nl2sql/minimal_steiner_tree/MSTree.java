@@ -73,7 +73,7 @@ public class MSTree {
      * @author zpei
      * @create 2024/12/8
      **/
-    public void initial(MatrixGraph graph) {
+    public void initialize(MatrixGraph graph) {
         this.graph = graph;
         this.n = graph.getNodeCount();
         this.dist = new long[n][n];

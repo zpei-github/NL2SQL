@@ -11,7 +11,7 @@ mybatis:
 
 llm:
   apikey: ${DASHSCOPE_API_KEY}
-  model: "qwen-max"
+  model: "qwen-plus"
 
 milvus:
   token: ${docker_milvus_token}
@@ -37,5 +37,3 @@ ollama:
   embedding:
     model: "bge-m3"
     url: ${docker_ollama_embedding_url}
-
-

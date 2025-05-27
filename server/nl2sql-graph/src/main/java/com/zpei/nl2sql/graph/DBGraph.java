@@ -101,6 +101,7 @@ public class DBGraph extends MatrixGraph {
         };
     }
 
+
     /** 添加一个节点
      * 在添加时会进行区分
      * @param n
@@ -474,7 +475,8 @@ public class DBGraph extends MatrixGraph {
                 if(granOfT1.getFields() != null && granOfT1.getFields().contains(field)) s += 2d;
 
                 // 倒排索引打分策略2: 数据量评价
-                s += Math.log10(t1.getRowCount()) / 10;
+
+                s += t1.getRowCount() == null ? 0d : Math.log10(t1.getRowCount()) / 10;
 
                 score.put(table, score.get(table) + s);
 
